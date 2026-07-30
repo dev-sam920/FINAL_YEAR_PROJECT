@@ -13,8 +13,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 
 // Environment variables are loaded via import 'dotenv/config' at top
 
-// Connect to MongoDB before accepting requests
-const startServer = async () => {
+const createApp = async () => {
   try {
     await connectDB();
 
@@ -105,21 +104,26 @@ const startServer = async () => {
     });
 
     /**
-     * Start server
+     * Start server locally
      */
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`
 ╔════════════════════════════════════════╗
 ║    SmartMaint API Server                ║
 ║    Running on port ${PORT}               ║
 ╚════════════════════════════════════════╝
-      `);
-    });
+        `);
+      });
+    }
+
+    return app;
   } catch (error) {
     console.error('Failed to start server:', error.message);
     process.exit(1);
   }
 };
 
-startServer();
+const app = await createApp();
+export default app;
