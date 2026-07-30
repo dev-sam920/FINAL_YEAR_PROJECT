@@ -1,0 +1,25 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+server/.env
+clinet/smartmaint/.env
+
+# Build outputs
+clinet/smartmaint/dist/
+
+# Uploads and runtime artifacts
+server/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# Editor directories
+.vscode/
+.idea/

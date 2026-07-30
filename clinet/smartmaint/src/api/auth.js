@@ -3,7 +3,7 @@
  * Handles signup, login, and logout operations
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
 
 /**
  * Sign up a new user
@@ -14,7 +14,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
  * @returns {Promise<Object>} Success response with user data
  * @throws {Error} With backend error message
  */
-export async function signupUser({ fullName, email, password }) {
+export async function signupUser({ fullName, email, password, role, specialty }) {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
@@ -26,6 +26,8 @@ export async function signupUser({ fullName, email, password }) {
         fullName,
         email,
         password,
+        role,
+        specialty,
       }),
     });
 
@@ -48,6 +50,26 @@ export async function signupUser({ fullName, email, password }) {
  * @returns {Promise<Object>} Success response with user data and token
  * @throws {Error} With backend error message
  */
+export async function technicianSignupUser(formData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/technician-signup`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to submit technician application');
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message || 'An error occurred during technician signup');
+  }
+}
+
 export async function loginUser({ email, password }) {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {

@@ -4,9 +4,11 @@ import {
   getAdminStats,
   getAllRequestsAdmin,
   getTechniciansAdmin,
+  getPendingTechniciansAdmin,
   createTechnician,
   getClientsAdmin,
   assignTechnician,
+  reviewTechnicianApplication,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -16,7 +18,9 @@ router.use(protect, authorize('admin'));
 router.get('/stats', getAdminStats);
 router.get('/requests', getAllRequestsAdmin);
 router.get('/technicians', getTechniciansAdmin);
+router.get('/technicians/pending', getPendingTechniciansAdmin);
 router.post('/technicians', createTechnician);
+router.patch('/technicians/:id/review', reviewTechnicianApplication);
 router.get('/clients', getClientsAdmin);
 router.patch('/requests/:id/assign', assignTechnician);
 

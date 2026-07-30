@@ -1,22 +1,32 @@
 import User from '../models/User.js';
+import { getUploadedAssetUrl } from '../config/cloudinary.js';
 
-export const buildUserResponse = (user, req) => ({
-  _id: user._id?.toString?.() || user._id,
-  id: user._id?.toString?.() || user._id,
-  fullName: user.fullName,
-  email: user.email,
-  role: user.role || 'client',
-  phone: user.phone || '',
-  address: user.address || user.unitAddress || '',
-  unitAddress: user.unitAddress || user.address || '',
-  state: user.state || '',
-  lga: user.lga || '',
-  specialty: user.specialty || 'General',
-  passwordChanged: user.passwordChanged ?? false,
-  profilePicture: user.profilePicture
-    ? `${req.protocol}://${req.get('host')}${user.profilePicture}`
-    : null,
-});
+export const buildUserResponse = (user, req) => {
+  const normalizeAssetUrl = (asset) => {
+    if (!asset) return null;
+    if (typeof asset === 'string' && /^(https?:)?\/\//i.test(asset)) return asset;
+    if (typeof asset === 'string' && asset.startsWith('/')) {
+      return `${req.protocol}://${req.get('host')}${asset}`;
+    }
+    return asset;
+  };
+
+  return {
+    _id: user._id?.toString?.() || user._id,
+    id: user._id?.toString?.() || user._id,
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role || 'client',
+    phone: user.phone || '',
+    address: user.address || user.unitAddress || '',
+    unitAddress: user.unitAddress || user.address || '',
+    state: user.state || '',
+    lga: user.lga || '',
+    specialty: user.specialty || 'General',
+    passwordChanged: user.passwordChanged ?? false,
+    profilePicture: normalizeAssetUrl(user.profilePicture),
+  };
+};
 
 export const updateProfile = async (req, res) => {
   try {
@@ -92,8 +102,8 @@ export const uploadProfilePicture = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const relativePath = `/uploads/profile-pictures/${req.file.filename}`;
-    user.profilePicture = relativePath;
+    const profilePictureUrl = getUploadedAssetUrl(req.file, `/uploads/profile-pictures/${req.file.filename}`);
+    user.profilePicture = profilePictureUrl;
     await user.save();
 
     res.status(200).json({

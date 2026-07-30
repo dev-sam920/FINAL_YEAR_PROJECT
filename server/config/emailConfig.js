@@ -38,7 +38,7 @@ export const welcomeEmailTemplate = (fullName) => {
                 </tr>
                 <tr>
                   <td style="text-align:center;padding-top:20px;">
-                    <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="display:inline-block;padding:10px 18px;border-radius:6px;background:#F5A623;color:#ffffff;text-decoration:none;font-weight:600;">Log in to SmartMaint</a>
+                    <a href="${process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/login` : '#'}" style="display:inline-block;padding:10px 18px;border-radius:6px;background:#F5A623;color:#ffffff;text-decoration:none;font-weight:600;">Log in to SmartMaint</a>
                   </td>
                 </tr>
                 <tr>
@@ -59,7 +59,7 @@ export const welcomeEmailTemplate = (fullName) => {
  */
 export const technicianWelcomeEmailTemplate = ({ fullName, email, password, loginUrl }) => {
   const name = fullName || 'Technician';
-  const safeLoginUrl = loginUrl || `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`;
+  const safeLoginUrl = loginUrl || (process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/login` : '#');
 
   return `
     <!doctype html>

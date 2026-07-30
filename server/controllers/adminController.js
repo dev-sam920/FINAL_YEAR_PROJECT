@@ -114,7 +114,7 @@ const generateTemporaryPassword = () => {
 
 export const getTechniciansAdmin = async (req, res) => {
   try {
-    const technicians = await User.find({ role: 'technician' }).select('fullName email specialty').lean();
+    const technicians = await User.find({ role: 'technician', accountStatus: { $ne: 'pending' } }).select('fullName email specialty idDocument yearsOfExperience bio').lean();
 
     const techsWithCounts = await Promise.all(
       technicians.map(async (tech) => {
@@ -143,6 +143,88 @@ export const getTechniciansAdmin = async (req, res) => {
   }
 };
 
+export const getPendingTechniciansAdmin = async (req, res) => {
+  try {
+    const pendingTechnicians = await User.find({ role: 'technician', accountStatus: 'pending' })
+      .select('fullName email phone state lga specialty yearsOfExperience bio profilePicture idDocument createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const technicians = pendingTechnicians.map((tech) => {
+      const normalizeAssetUrl = (asset) => {
+        if (!asset) return null;
+        if (typeof asset === 'string' && /^(https?:)?\/\//i.test(asset)) return asset;
+        if (typeof asset === 'string' && asset.startsWith('/')) {
+          return `${req.protocol}://${req.get('host')}${asset}`;
+        }
+        return asset;
+      };
+
+      return {
+        ...tech,
+        profilePicture: normalizeAssetUrl(tech.profilePicture),
+        idDocument: normalizeAssetUrl(tech.idDocument),
+        dateApplied: tech.createdAt,
+      };
+    });
+
+    res.status(200).json({ technicians });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to load pending technicians' });
+  }
+};
+
+export const reviewTechnicianApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid technician ID' });
+    }
+
+    const technician = await User.findOne({ _id: id, role: 'technician' });
+    if (!technician) {
+      return res.status(404).json({ message: 'Technician application not found' });
+    }
+
+    if (technician.accountStatus === 'approved' && action === 'approve') {
+      return res.status(200).json({ message: 'Technician is already approved', technician });
+    }
+
+    if (action === 'approve') {
+      technician.accountStatus = 'approved';
+      technician.passwordChanged = false;
+      await technician.save();
+
+      await sendEmail({
+        to: technician.email,
+        subject: 'Your SmartMaint technician account has been approved',
+        html: `<p>Hi ${technician.fullName},</p><p>Your technician application has been approved. You can now sign in to SmartMaint.</p>`,
+      });
+
+      return res.status(200).json({ message: 'Technician application approved', technician });
+    }
+
+    if (action === 'decline') {
+      technician.accountStatus = 'declined';
+      await technician.save();
+
+      await sendEmail({
+        to: technician.email,
+        subject: 'Your SmartMaint technician application was declined',
+        html: `<p>Hi ${technician.fullName},</p><p>We are unable to approve your technician application at this time. Please contact support for more information.</p>`,
+      });
+
+      return res.status(200).json({ message: 'Technician application declined', technician });
+    }
+
+    return res.status(400).json({ message: 'Invalid action' });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to update technician application' });
+  }
+};
+
 export const createTechnician = async (req, res) => {
   try {
     const { fullName, email } = req.body;
@@ -167,7 +249,7 @@ export const createTechnician = async (req, res) => {
       passwordChanged: false,
     });
 
-    const loginUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`;
+    const loginUrl = process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/login` : '#';
     await sendEmail({
       to: technician.email,
       subject: 'Your SmartMaint technician account is ready',

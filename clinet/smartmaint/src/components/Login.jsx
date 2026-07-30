@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/auth';
 import { AuthContext } from '../context/AuthContext';
 import heroImage from '../assets/hero.png';
@@ -7,6 +7,7 @@ import './css/Login.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -74,7 +75,8 @@ export default function Login() {
         setError('Login failed. Please try again.');
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      const message = err.message || 'Login failed. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -107,6 +109,11 @@ export default function Login() {
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
+            {location.state?.message && (
+              <div className="success-message" style={{ marginBottom: 12, padding: '0.8rem 1rem', borderRadius: 12, background: '#ECFDF3', color: '#166534' }}>
+                {location.state.message}
+              </div>
+            )}
             {error && (
               <div className="error-message">
                 {error}

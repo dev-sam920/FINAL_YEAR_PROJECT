@@ -1,6 +1,7 @@
 import Request from '../models/Request.js';
 import User from '../models/User.js';
 import { createNotification } from './notificationController.js';
+import { getUploadedAssetUrl } from '../config/cloudinary.js';
 
 export const getTechnicianStats = async (req, res) => {
   try {
@@ -77,6 +78,62 @@ export const changeTechnicianPassword = async (req, res) => {
     res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Failed to update password' });
+  }
+};
+
+export const completeTechnicianProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role !== 'technician') {
+      return res.status(403).json({ message: 'Only technicians can complete their profile' });
+    }
+
+    const fullName = String(req.body.fullName || '').trim();
+    const phone = String(req.body.phone || '').trim();
+    const address = String(req.body.address || '').trim();
+    const state = String(req.body.state || '').trim();
+    const lga = String(req.body.lga || '').trim();
+    const specialty = String(req.body.specialty || '').trim();
+    const yearsOfExperience = req.body.yearsOfExperience ? Number(req.body.yearsOfExperience) : null;
+    const bio = String(req.body.bio || '').trim();
+
+    if (!fullName || !phone || !address || !state || !lga || !specialty) {
+      return res.status(400).json({ message: 'Please fill in all profile fields' });
+    }
+
+    if (Number.isNaN(yearsOfExperience)) {
+      return res.status(400).json({ message: 'Years of experience must be a number' });
+    }
+
+    if (req.file && req.file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ message: 'ID document must be smaller than 5MB' });
+    }
+
+    const filePath = getUploadedAssetUrl(req.file, req.file ? `/uploads/technician-documents/${req.file.filename}` : null) || user.idDocument || null;
+
+    user.fullName = fullName || user.fullName;
+    user.phone = phone;
+    user.address = address;
+    user.state = state;
+    user.lga = lga;
+    user.specialty = specialty;
+    user.yearsOfExperience = yearsOfExperience;
+    user.bio = bio;
+    user.idDocument = filePath;
+    user.profileCompleted = true;
+    await user.save();
+
+    const updatedUser = await User.findById(user._id).select('-password');
+    res.status(200).json({
+      message: 'Profile completed successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to complete profile' });
   }
 };
 

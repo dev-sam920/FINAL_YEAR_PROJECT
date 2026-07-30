@@ -68,6 +68,28 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: 'General',
     },
+    profileCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    idDocument: {
+      type: String,
+      default: null,
+    },
+    yearsOfExperience: {
+      type: Number,
+      default: null,
+    },
+    bio: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    accountStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'declined'],
+      default: 'approved',
+    },
     passwordChanged: {
       type: Boolean,
       default: false,

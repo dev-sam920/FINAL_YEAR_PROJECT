@@ -17,20 +17,37 @@ export default function Clients() {
   }, []);
 
   return (
-    <div>
-      <h1></h1>
-      <div style={{ marginTop: 12 }}>
-        {clients.map((c) => (
-          <div key={c._id} style={{ padding: 12, border: '1px solid #E5E7EB', borderRadius: 12, marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontWeight: 700 }}>{c.fullName}</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{c.email}</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{c.phone} · {c.unitAddress}</div>
-              </div>
-            </div>
-          </div>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: '1.2rem 1.3rem' }}>
+        <p style={{ margin: 0, color: '#0B2818', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Client directory</p>
+        <h1 style={{ margin: '0.25rem 0 0', fontSize: '1.55rem', color: '#111111' }}>Clients</h1>
+        <p style={{ margin: '0.25rem 0 0', color: '#6B7280' }}>A calm view of client accounts and contact details.</p>
+      </div>
+
+      <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+        <div style={{ padding: '1rem 1.2rem', borderBottom: '1px solid #F3F4F6', fontWeight: 700, color: '#111111' }}>Registered clients</div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
+            <thead style={{ background: '#F7F7F5' }}>
+              <tr>
+                <th style={{ padding: '0.9rem 1rem', textAlign: 'left', color: '#6B7280', fontSize: 13 }}>Name</th>
+                <th style={{ padding: '0.9rem 1rem', textAlign: 'left', color: '#6B7280', fontSize: 13 }}>Email</th>
+                <th style={{ padding: '0.9rem 1rem', textAlign: 'left', color: '#6B7280', fontSize: 13 }}>Phone</th>
+                <th style={{ padding: '0.9rem 1rem', textAlign: 'left', color: '#6B7280', fontSize: 13 }}>Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clients.map((c) => (
+                <tr key={c._id} style={{ borderTop: '1px solid #F3F4F6' }}>
+                  <td style={{ padding: '0.95rem 1rem', fontWeight: 700 }}>{c.fullName}</td>
+                  <td style={{ padding: '0.95rem 1rem', color: '#4B5563' }}>{c.email}</td>
+                  <td style={{ padding: '0.95rem 1rem', color: '#4B5563' }}>{c.phone || '—'}</td>
+                  <td style={{ padding: '0.95rem 1rem', color: '#4B5563' }}>{c.unitAddress || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

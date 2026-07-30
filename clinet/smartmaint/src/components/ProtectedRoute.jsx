@@ -2,6 +2,12 @@ import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
+const getFallbackPath = (role) => {
+  if (role === 'admin') return '/admin-dashboard';
+  if (role === 'technician') return '/technician-dashboard';
+  return '/client-dashboard';
+};
+
 export default function ProtectedRoute({ children, roles }) {
   const { user, loading } = useContext(AuthContext);
 
@@ -28,7 +34,7 @@ export default function ProtectedRoute({ children, roles }) {
   }
 
   if (roles && roles.length > 0 && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={getFallbackPath(user.role)} replace />;
   }
 
   return children;

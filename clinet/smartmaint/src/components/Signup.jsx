@@ -1,8 +1,66 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import NaijaStates from 'naija-state-local-government';
 import { useNavigate } from 'react-router-dom';
-import { signupUser } from '../api/auth';
+import { signupUser, technicianSignupUser } from '../api/auth';
 import heroImage from '../assets/hero.png';
 import './css/Signup.css';
+
+const specialtyOptions = ['Plumbing', 'Electrical', 'HVAC', 'Structural', 'Appliance', 'General'];
+const stateOptions = [
+  'Abia',
+  'Adamawa',
+  'Akwa Ibom',
+  'Anambra',
+  'Bauchi',
+  'Bayelsa',
+  'Benue',
+  'Borno',
+  'Cross River',
+  'Delta',
+  'Ebonyi',
+  'Edo',
+  'Ekiti',
+  'Enugu',
+  'FCT',
+  'Gombe',
+  'Imo',
+  'Jigawa',
+  'Kaduna',
+  'Kano',
+  'Katsina',
+  'Kebbi',
+  'Kogi',
+  'Kwara',
+  'Lagos',
+  'Nasarawa',
+  'Niger',
+  'Ogun',
+  'Ondo',
+  'Osun',
+  'Oyo',
+  'Plateau',
+  'Rivers',
+  'Sokoto',
+  'Taraba',
+  'Yobe',
+  'Zamfara',
+];
+
+const getLgaOptions = (selectedState) => {
+  if (!selectedState || !selectedState.trim()) {
+    return [];
+  }
+
+  try {
+    const response = NaijaStates.lgas(selectedState);
+    if (Array.isArray(response)) return response;
+    if (response && Array.isArray(response.lgas)) return response.lgas;
+    return [];
+  } catch (error) {
+    console.error('Failed to load local governments:', error);
+    return [];
+  }
+};
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -13,6 +71,13 @@ export default function Signup() {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'client',
+    phone: '',
+    state: '',
+    lga: '',
+    specialty: 'General',
+    yearsOfExperience: '',
+    bio: '',
   });
 
   // UI state
@@ -21,6 +86,12 @@ export default function Signup() {
   const [passwordStrength, setPasswordStrength] = useState({ level: 'weak', color: '#ba1a1a' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [availableLgas, setAvailableLgas] = useState([]);
+  const [lgaHelpText, setLgaHelpText] = useState('Select a state first');
+  const [profilePicturePreview, setProfilePicturePreview] = useState('');
+  const [profilePictureFile, setProfilePictureFile] = useState(null);
+  const [idDocumentFile, setIdDocumentFile] = useState(null);
+  const [idDocumentName, setIdDocumentName] = useState('');
 
   /**
    * Calculate password strength
@@ -65,6 +136,22 @@ export default function Signup() {
     return emailRegex.test(email);
   };
 
+  useEffect(() => {
+    if (!formData.state) {
+      setAvailableLgas([]);
+      setLgaHelpText('Select a state first');
+      return;
+    }
+
+    const nextLgas = getLgaOptions(formData.state);
+    setAvailableLgas(nextLgas);
+    setLgaHelpText(nextLgas.length > 0 ? '' : 'No local governments available for this state');
+
+    if (formData.lga && !nextLgas.includes(formData.lga)) {
+      setFormData((prev) => ({ ...prev, lga: '' }));
+    }
+  }, [formData.state]);
+
   /**
    * Handle form input changes
    */
@@ -77,12 +164,45 @@ export default function Signup() {
       [fieldName]: value,
     }));
 
-    // Update password strength when password changes
     if (fieldName === 'password') {
       setPasswordStrength(calculatePasswordStrength(value));
     }
 
-    // Clear error when user starts typing
+    if (error) {
+      setError('');
+    }
+  };
+
+  const handleFileChange = (event, kind) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (kind === 'profilePicture') {
+      if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+        setError('Please upload a JPG or PNG profile picture');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Profile picture must be smaller than 5MB');
+        return;
+      }
+      setProfilePictureFile(file);
+      setProfilePicturePreview(URL.createObjectURL(file));
+    }
+
+    if (kind === 'idDocument') {
+      if (!['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+        setError('Please upload a PDF, JPG, or PNG document');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('ID document must be smaller than 5MB');
+        return;
+      }
+      setIdDocumentFile(file);
+      setIdDocumentName(file.name);
+    }
+
     if (error) {
       setError('');
     }
@@ -121,6 +241,29 @@ export default function Signup() {
     if (!validateEmail(formData.email)) {
       setError('Please enter a valid email address');
       return false;
+    }
+
+    if (formData.role === 'technician') {
+      if (!formData.phone.trim()) {
+        setError('Phone number is required for technician applications');
+        return false;
+      }
+      if (!formData.state || !formData.lga) {
+        setError('Please choose your state and local government');
+        return false;
+      }
+      if (!formData.specialty.trim()) {
+        setError('Please share your specialty so we can review your application');
+        return false;
+      }
+      if (!profilePictureFile) {
+        setError('Please upload a profile picture');
+        return false;
+      }
+      if (!idDocumentFile) {
+        setError('Please upload an ID document or certificate');
+        return false;
+      }
     }
 
     if (!formData.password) {
@@ -163,17 +306,36 @@ export default function Signup() {
       setLoading(true);
       setError('');
 
-      // Call signup API
-      const response = await signupUser({
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-      });
+      if (formData.role === 'technician') {
+        const payload = new FormData();
+        payload.append('fullName', formData.fullName);
+        payload.append('email', formData.email);
+        payload.append('password', formData.password);
+        payload.append('phone', formData.phone);
+        payload.append('state', formData.state);
+        payload.append('lga', formData.lga);
+        payload.append('specialty', formData.specialty);
+        payload.append('yearsOfExperience', formData.yearsOfExperience || '');
+        payload.append('bio', formData.bio);
+        payload.append('profilePicture', profilePictureFile);
+        payload.append('idDocument', idDocumentFile);
 
-      // Success - redirect to login page
+        await technicianSignupUser(payload);
+      } else {
+        await signupUser({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          specialty: formData.specialty,
+        });
+      }
+
       navigate('/login', {
         state: {
-          message: 'Account created successfully! Please log in.',
+          message: formData.role === 'technician'
+            ? 'Technician application submitted successfully. We will review it shortly.'
+            : 'Account created successfully! Please log in.',
         },
       });
     } catch (err) {
@@ -235,6 +397,144 @@ export default function Signup() {
                 disabled={loading}
               />
             </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="role">I AM REGISTERING AS</label>
+              <select
+                className="form-input"
+                id="role"
+                value={formData.role}
+                onChange={handleInputChange}
+                disabled={loading}
+              >
+                <option value="client">Client</option>
+                <option value="technician">Technician</option>
+              </select>
+            </div>
+
+            {formData.role === 'technician' && (
+              <>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="phone">PHONE NUMBER</label>
+                  <input
+                    className="form-input"
+                    id="phone"
+                    placeholder="E.g. 08012345678"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="state">STATE</label>
+                  <select
+                    className="form-input"
+                    id="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  >
+                    <option value="">Select state</option>
+                    {stateOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="lga">LOCAL GOVERNMENT</label>
+                  <select
+                    className="form-input"
+                    id="lga"
+                    value={formData.lga}
+                    onChange={handleInputChange}
+                    disabled={loading || !formData.state || availableLgas.length === 0}
+                  >
+                    <option value="">{formData.state ? (availableLgas.length > 0 ? 'Select local government' : 'No local governments available') : 'Select a state first'}</option>
+                    {availableLgas.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                  {lgaHelpText && <div style={{ marginTop: 6, fontSize: 12, color: '#6B7280' }}>{lgaHelpText}</div>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="specialty">SPECIALTY</label>
+                  <select
+                    className="form-input"
+                    id="specialty"
+                    value={formData.specialty}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  >
+                    {specialtyOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="yearsOfExperience">YEARS OF EXPERIENCE</label>
+                  <input
+                    className="form-input"
+                    id="yearsOfExperience"
+                    placeholder="E.g. 5"
+                    type="number"
+                    min="0"
+                    value={formData.yearsOfExperience}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="bio">BIO</label>
+                  <textarea
+                    className="form-input"
+                    id="bio"
+                    placeholder="Tell us about your experience"
+                    rows={4}
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                    style={{ resize: 'vertical', minHeight: 110 }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="profilePicture">PROFILE PICTURE</label>
+                  <input
+                    className="form-input"
+                    id="profilePicture"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={(event) => handleFileChange(event, 'profilePicture')}
+                    disabled={loading}
+                  />
+                  {profilePicturePreview && (
+                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <img src={profilePicturePreview} alt="Profile preview" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '1px solid #E5E7EB' }} />
+                      <span style={{ color: '#0B2818', fontWeight: 700 }}>Preview ready</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="idDocument">ID / CERTIFICATE</label>
+                  <input
+                    className="form-input"
+                    id="idDocument"
+                    type="file"
+                    accept="application/pdf,image/png,image/jpeg,image/jpg"
+                    onChange={(event) => handleFileChange(event, 'idDocument')}
+                    disabled={loading}
+                  />
+                  {idDocumentName && <div style={{ marginTop: 8, color: '#0B2818', fontWeight: 700 }}>Selected: {idDocumentName}</div>}
+                </div>
+              </>
+            )}
 
             {/* Email Field */}
             <div className="form-group">

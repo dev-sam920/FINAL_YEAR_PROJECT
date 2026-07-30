@@ -1,6 +1,4 @@
 import 'dotenv/config';
-import fs from 'fs';
-import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -21,22 +19,22 @@ const startServer = async () => {
     await connectDB();
 
     const app = express();
-    const uploadsPath = path.resolve('uploads');
-    const profilePicturesPath = path.join(uploadsPath, 'profile-pictures');
-    fs.mkdirSync(profilePicturesPath, { recursive: true });
 
     /**
      * CORS Configuration
      * Allow frontend to communicate with backend
      */
+    const isProduction = String(process.env.NODE_ENV).toLowerCase() === 'production';
     const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:5174',
-      'http://127.0.0.1:4173',
-      'http://127.0.0.1:4174',
-      process.env.CLIENT_URL,
+      ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+      ...(!isProduction ? [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:4173',
+        'http://127.0.0.1:4174',
+      ] : []),
     ].filter(Boolean);
 
     app.use(
@@ -64,7 +62,6 @@ const startServer = async () => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    app.use('/uploads', express.static('uploads'));
 
     /**
      * Health check endpoint

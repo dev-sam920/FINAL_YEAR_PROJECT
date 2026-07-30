@@ -16,6 +16,16 @@ export async function getTechnicians() {
   return resp.data;
 }
 
+export async function getPendingTechnicians() {
+  const resp = await axiosInstance.get('/api/admin/technicians/pending');
+  return resp.data;
+}
+
+export async function reviewTechnicianApplication(technicianId, action) {
+  const resp = await axiosInstance.patch(`/api/admin/technicians/${technicianId}/review`, { action });
+  return resp.data;
+}
+
 export async function createTechnician(data) {
   const resp = await axiosInstance.post('/api/admin/technicians', {
     fullName: data?.fullName,
