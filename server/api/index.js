@@ -47,6 +47,13 @@ const createApp = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
+  app.get('/', (req, res) => {
+    res.status(200).json({
+      status: 'SmartMaint API is running',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
   app.get('/api/health', (req, res) => {
     res.status(200).json({
       status: 'ok',
