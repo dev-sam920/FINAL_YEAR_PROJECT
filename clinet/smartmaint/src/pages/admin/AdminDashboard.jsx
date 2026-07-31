@@ -52,7 +52,7 @@ function AssignTechnicianModal({ isOpen, onClose, requestId, requestTitle, onAss
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get('/api/admin/technicians');
+      const response = await axiosInstance.get('/admin/technicians');
       const techData = response.data?.technicians || response.data?.data || response.data || [];
       setTechnicians(Array.isArray(techData) ? techData : []);
     } catch (err) {
@@ -73,7 +73,7 @@ function AssignTechnicianModal({ isOpen, onClose, requestId, requestTitle, onAss
     try {
       setAssigning(true);
       setError(null);
-      await axiosInstance.patch(`/api/admin/requests/${requestId}/assign`, {
+      await axiosInstance.patch(`/admin/requests/${requestId}/assign`, {
         technicianId: selectedTechnicianId
       });
       onAssignSuccess();
@@ -198,7 +198,7 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       setStatsLoading(true);
-      const response = await axiosInstance.get('/api/admin/stats');
+      const response = await axiosInstance.get('/admin/stats');
       const statsData = response.data?.data || response.data || {};
       setStats({
         totalRequests: statsData.totalRequests || 0,
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get('/api/admin/requests');
+      const response = await axiosInstance.get('/admin/requests');
       const requestsData = response.data?.requests || response.data?.data || response.data || [];
       setRequests(Array.isArray(requestsData) ? requestsData : []);
     } catch (err) {
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
   const markRequestComplete = async (requestId) => {
     if (!window.confirm('Mark this request as complete?')) return;
     try {
-      await axiosInstance.patch(`/api/admin/requests/${requestId}`, { status: 'completed' });
+      await axiosInstance.patch(`/admin/requests/${requestId}`, { status: 'completed' });
       fetchRequests();
       fetchStats();
     } catch (err) {
@@ -318,7 +318,7 @@ export default function AdminDashboard() {
   const deleteRequest = async (requestId) => {
     if (!window.confirm('Delete this request? This action cannot be undone.')) return;
     try {
-      await axiosInstance.delete(`/api/admin/requests/${requestId}`);
+      await axiosInstance.delete(`/admin/requests/${requestId}`);
       fetchRequests();
       fetchStats();
     } catch (err) {

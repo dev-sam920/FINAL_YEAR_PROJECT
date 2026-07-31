@@ -92,7 +92,7 @@ export default function SubmitRequest() {
     setErrorMessage('');
 
     try {
-      await axiosInstance.post('/api/requests', {
+      await axiosInstance.post('/requests', {
         title: formData.title,
         category: formData.category,
         priority: formData.priority,
