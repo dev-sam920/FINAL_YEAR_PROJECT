@@ -23,23 +23,18 @@ const generateToken = (userId, role) => {
  * @param {string} token - JWT token
  */
 const setTokenCookie = (res, token) => {
-  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
-  // Convert expiry to milliseconds (simple conversion for common formats)
-  let maxAge = 7 * 24 * 60 * 60 * 1000; // Default 7 days in ms
-  
-  if (expiresIn.endsWith('d')) {
-    maxAge = parseInt(expiresIn) * 24 * 60 * 60 * 1000;
-  } else if (expiresIn.endsWith('h')) {
-    maxAge = parseInt(expiresIn) * 60 * 60 * 1000;
-  }
+  const isProduction = process.env.NODE_ENV === 'production';
 
-  const isProduction = String(process.env.NODE_ENV).toLowerCase() === 'production';
+  console.log('[auth-cookie] setting token cookie', {
+    nodeEnv: process.env.NODE_ENV,
+    isProduction,
+  });
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
-    maxAge,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
 
@@ -310,7 +305,16 @@ export const login = async (req, res) => {
  */
 export const logout = async (req, res) => {
   try {
-    res.clearCookie('token');
+    console.log('[auth-cookie] clearing token cookie', {
+      nodeEnv: process.env.NODE_ENV,
+      isProduction: process.env.NODE_ENV === 'production',
+    });
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
 
     res.status(200).json({
       message: 'Logged out successfully',
