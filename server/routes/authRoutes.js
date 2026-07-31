@@ -22,6 +22,12 @@ const upload = createUploadMiddleware({
  * Public routes
  */
 router.post('/signup', signup);
+router.get('/debug-env', (req, res) => {
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    isProd: process.env.NODE_ENV === 'production',
+  });
+});
 router.post('/technician-signup', upload.fields([
   { name: 'profilePicture', maxCount: 1 },
   { name: 'idDocument', maxCount: 1 },

@@ -285,6 +285,7 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user._id, user.role);
+    console.log('DEBUG - NODE_ENV value:', process.env.NODE_ENV, 'Type:', typeof process.env.NODE_ENV);
     setTokenCookie(res, token);
 
     res.status(200).json({
