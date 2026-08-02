@@ -104,13 +104,13 @@ export const signup = async (req, res) => {
       });
 
       try {
-        sendEmail({
+        await sendEmail({
           to: user.email,
           subject: 'Your SmartMaint technician application is under review',
           html: `<p>Hi ${user.fullName},</p><p>Thanks for applying to join SmartMaint as a technician. Your application is now under review by our admin team.</p><p>We will contact you once a decision has been made.</p>`,
         });
-      } catch (err) {
-        console.error('Unexpected error while sending technician signup email:', err?.message || err);
+      } catch (emailError) {
+        console.error('Failed to send technician signup email:', emailError);
       }
 
       return res.status(201).json({
@@ -131,13 +131,13 @@ export const signup = async (req, res) => {
     setTokenCookie(res, token);
 
     try {
-      sendEmail({
+      await sendEmail({
         to: user.email,
         subject: 'Welcome to SmartMaint!',
         html: welcomeEmailTemplate(user.fullName),
       });
-    } catch (err) {
-      console.error('Unexpected error while sending welcome email:', err?.message || err);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
     }
 
     res.status(201).json({
@@ -217,13 +217,13 @@ export const technicianSignup = async (req, res) => {
     });
 
     try {
-      sendEmail({
+      await sendEmail({
         to: user.email,
         subject: 'Your SmartMaint technician application is under review',
         html: `<p>Hi ${user.fullName},</p><p>Thanks for applying to join SmartMaint as a technician. Your application is now under review by our admin team.</p><p>We will contact you once a decision has been made.</p>`,
       });
-    } catch (err) {
-      console.error('Unexpected error while sending technician signup email:', err?.message || err);
+    } catch (emailError) {
+      console.error('Failed to send technician signup email:', emailError);
     }
 
     return res.status(201).json({

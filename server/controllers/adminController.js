@@ -197,11 +197,15 @@ export const reviewTechnicianApplication = async (req, res) => {
       technician.passwordChanged = false;
       await technician.save();
 
-      await sendEmail({
-        to: technician.email,
-        subject: 'Your SmartMaint technician account has been approved',
-        html: `<p>Hi ${technician.fullName},</p><p>Your technician application has been approved. You can now sign in to SmartMaint.</p>`,
-      });
+      try {
+        await sendEmail({
+          to: technician.email,
+          subject: 'Your SmartMaint technician account has been approved',
+          html: `<p>Hi ${technician.fullName},</p><p>Your technician application has been approved. You can now sign in to SmartMaint.</p>`,
+        });
+      } catch (emailError) {
+        console.error('Failed to send approval email:', emailError);
+      }
 
       return res.status(200).json({ message: 'Technician application approved', technician });
     }
@@ -210,11 +214,15 @@ export const reviewTechnicianApplication = async (req, res) => {
       technician.accountStatus = 'declined';
       await technician.save();
 
-      await sendEmail({
-        to: technician.email,
-        subject: 'Your SmartMaint technician application was declined',
-        html: `<p>Hi ${technician.fullName},</p><p>We are unable to approve your technician application at this time. Please contact support for more information.</p>`,
-      });
+      try {
+        await sendEmail({
+          to: technician.email,
+          subject: 'Your SmartMaint technician application was declined',
+          html: `<p>Hi ${technician.fullName},</p><p>We are unable to approve your technician application at this time. Please contact support for more information.</p>`,
+        });
+      } catch (emailError) {
+        console.error('Failed to send decline email:', emailError);
+      }
 
       return res.status(200).json({ message: 'Technician application declined', technician });
     }
@@ -250,16 +258,20 @@ export const createTechnician = async (req, res) => {
     });
 
     const loginUrl = process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/login` : '#';
-    await sendEmail({
-      to: technician.email,
-      subject: 'Your SmartMaint technician account is ready',
-      html: technicianWelcomeEmailTemplate({
-        fullName: technician.fullName,
-        email: technician.email,
-        password: temporaryPassword,
-        loginUrl,
-      }),
-    });
+    try {
+      await sendEmail({
+        to: technician.email,
+        subject: 'Your SmartMaint technician account is ready',
+        html: technicianWelcomeEmailTemplate({
+          fullName: technician.fullName,
+          email: technician.email,
+          password: temporaryPassword,
+          loginUrl,
+        }),
+      });
+    } catch (emailError) {
+      console.error('Failed to send technician credentials email:', emailError);
+    }
 
     const technicianResponse = technician.toObject();
     delete technicianResponse.password;
