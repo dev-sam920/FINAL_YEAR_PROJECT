@@ -8,6 +8,7 @@ import SubmitRequest from './pages/client/SubmitRequest';
 import Profile from './pages/client/Profile';
 import Support from './pages/client/Support';
 import MyRequests from './pages/client/MyRequests';
+import PaymentCallback from './pages/client/PaymentCallback';
 import ClientLayout from './layouts/ClientLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -79,6 +80,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/payment-callback" element={<PaymentCallback />} />
           <Route
             path="/admin-dashboard"
             element={

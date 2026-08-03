@@ -35,6 +35,7 @@ export default function MyAssignments() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [note, setNote] = useState('');
+  const [jobCost, setJobCost] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -77,7 +78,7 @@ export default function MyAssignments() {
     setErrorMessage('');
     setSuccessMessage('');
     try {
-      await updateRequestStatus(requestId, status, '');
+      await updateRequestStatus(requestId, status, '', '');
       setSuccessMessage('Status updated');
       await loadRequests();
     } catch (err) {
@@ -93,10 +94,16 @@ export default function MyAssignments() {
     setErrorMessage('');
     setSuccessMessage('');
     try {
-      await updateRequestStatus(pendingRequestId, 'completed', note);
+      if (!jobCost || Number(jobCost) <= 0) {
+        setErrorMessage('Please enter a valid job cost before completing the request');
+        return;
+      }
+
+      await updateRequestStatus(pendingRequestId, 'completed', note, jobCost);
       setSuccessMessage('Request marked as completed');
       setPendingRequestId(null);
       setNote('');
+      setJobCost('');
       await loadRequests();
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Failed to complete request');
@@ -154,10 +161,12 @@ export default function MyAssignments() {
 
                 {pendingRequestId === request._id && (
                   <div style={{ marginTop: 12, padding: '0.9rem', borderRadius: 16, background: '#F9FAFB', border: '1px solid #E5E7EB' }} onClick={(event) => event.stopPropagation()}>
+                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 700 }}>Job Cost (₦)</label>
+                    <input type="number" min="0" value={jobCost} onChange={(event) => setJobCost(event.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB', marginBottom: 10 }} />
                     <label style={{ display: 'block', marginBottom: 6, fontWeight: 700 }}>Completion note (optional)</label>
                     <textarea value={note} onChange={(event) => setNote(event.target.value)} style={{ width: '100%', minHeight: 90, padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB' }} />
                     <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
-                      <button type="button" onClick={() => { setPendingRequestId(null); setNote(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
+                      <button type="button" onClick={() => { setPendingRequestId(null); setNote(''); setJobCost(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
                       <button type="button" onClick={confirmCompletion} disabled={loading} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Finish Request</button>
                     </div>
                   </div>

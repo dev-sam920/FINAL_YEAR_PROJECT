@@ -2,6 +2,7 @@ import Request from '../models/Request.js';
 import User from '../models/User.js';
 import { createNotification } from './notificationController.js';
 import { getUploadedAssetUrl } from '../config/cloudinary.js';
+import { paymentDueEmailTemplate, sendEmail } from '../config/emailConfig.js';
 
 export const getTechnicianStats = async (req, res) => {
   try {
@@ -141,7 +142,7 @@ export const updateTechnicianRequestStatus = async (req, res) => {
   try {
     const technicianId = req.user.id;
     const { id } = req.params;
-    const { status, note } = req.body;
+    const { status, note, jobCost } = req.body;
 
     const request = await Request.findById(id);
     if (!request) return res.status(404).json({ message: 'Request not found' });
@@ -165,31 +166,76 @@ export const updateTechnicianRequestStatus = async (req, res) => {
       request.completionNote = note.trim();
     }
 
+    if (status === 'completed') {
+      const parsedJobCost = Number(jobCost);
+      if (!Number.isFinite(parsedJobCost) || parsedJobCost <= 0) {
+        return res.status(400).json({ message: 'Please enter a valid job cost before completing the request' });
+      }
+
+      const platformFee = Math.round(parsedJobCost * 0.10);
+      const totalAmount = parsedJobCost + platformFee;
+
+      request.jobCost = parsedJobCost;
+      request.platformFee = platformFee;
+      request.totalAmount = totalAmount;
+      request.paymentStatus = 'unpaid';
+      request.paymentReference = null;
+      request.paidAt = null;
+    }
+
     await request.save();
 
-    if (request.client) {
-      const clientId = typeof request.client === 'string' ? request.client : request.client.toString();
-      const requestTitle = request.title || 'your request';
+    const populatedRequest = await Request.findById(id).populate('client', 'fullName email phone');
+
+    if (populatedRequest?.client) {
+      const clientId = typeof populatedRequest.client === 'string' ? populatedRequest.client : populatedRequest.client._id?.toString?.() || populatedRequest.client.toString();
+      const requestTitle = populatedRequest.title || 'your request';
       const statusLabel = status === 'completed' ? 'completed' : status;
 
       if (status === 'completed') {
-        await createNotification({
-          recipientId: clientId,
-          message: `Your request '${requestTitle}' is complete — please rate the service`,
-          type: 'rating_prompt',
-          relatedRequest: request._id,
-        });
+        await Promise.all([
+          createNotification({
+            recipientId: clientId,
+            message: `Your request '${requestTitle}' is complete — please rate the service`,
+            type: 'rating_prompt',
+            relatedRequest: populatedRequest._id,
+          }),
+          createNotification({
+            recipientId: clientId,
+            message: `Your completed request '${requestTitle}' is ready for payment. Total amount due is ₦${Number(populatedRequest.totalAmount || 0).toLocaleString()} — please proceed to payment.`,
+            type: 'payment',
+            relatedRequest: populatedRequest._id,
+          }),
+        ]);
+
+        try {
+          const paymentLink = `${process.env.CLIENT_URL || 'https://smartmaint.app'}/my-requests`;
+          await sendEmail({
+            to: populatedRequest.client.email,
+            subject: 'Payment Due - SmartMaint',
+            html: paymentDueEmailTemplate(
+              populatedRequest.client.fullName || populatedRequest.client.email,
+              requestTitle,
+              populatedRequest.jobCost,
+              populatedRequest.platformFee,
+              populatedRequest.totalAmount,
+              paymentLink,
+            ),
+          });
+        } catch (emailError) {
+          console.error('Failed to send payment due email:', emailError?.message || emailError);
+        }
       } else {
         await createNotification({
           recipientId: clientId,
           message: `Your request '${requestTitle}' is now ${statusLabel}`,
           type: 'status_update',
-          relatedRequest: request._id,
+          relatedRequest: populatedRequest._id,
         });
       }
     }
 
-    const updatedRequest = await Request.findById(id).populate('client', 'fullName email phone');
+    const updatedRequest = populatedRequest || await Request.findById(id).populate('client', 'fullName email phone');
 
     res.status(200).json({ message: 'Status updated', request: updatedRequest });
   } catch (error) {

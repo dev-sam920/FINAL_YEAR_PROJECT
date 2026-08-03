@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['status_update', 'assignment', 'new_request', 'rating_prompt'],
+      enum: ['status_update', 'assignment', 'new_request', 'rating_prompt', 'payment', 'payment_received'],
       default: 'status_update',
     },
     relatedRequest: {

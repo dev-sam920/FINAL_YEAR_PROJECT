@@ -53,6 +53,109 @@ export const welcomeEmailTemplate = (fullName) => {
   `;
 };
 
+export const paymentDueEmailTemplate = (clientName, requestTitle, jobCost, platformFee, totalAmount, paymentLink) => {
+  const name = clientName || 'there';
+  const safeRequestTitle = requestTitle || 'your maintenance request';
+  const safePaymentLink = paymentLink || (process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/my-requests` : '#');
+
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+      </head>
+      <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+        <table role="presentation" style="width:100%;height:100%;background:#ffffff;">
+          <tr>
+            <td align="center">
+              <table role="presentation" style="max-width:600px;width:100%;margin:40px 16px;padding:24px;border-radius:8px;border:1px solid #f1f5f9;">
+                <tr>
+                  <td style="text-align:left;padding-bottom:16px;">
+                    <h1 style="margin:0;color:#111111;font-size:24px;">Hi ${name}, your maintenance request '${safeRequestTitle}' has been completed!</h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:left;padding:12px 0;color:#4b5563;line-height:1.6;">
+                    <p style="margin:0 0 12px 0;">A technician has finalized the job and your payment is now due.</p>
+                    <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e5e7eb;">
+                      <tr>
+                        <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#111111;">Service Cost</td>
+                        <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#111111;font-weight:600;">₦${Number(jobCost || 0).toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#111111;">Platform Fee (10%)</td>
+                        <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#111111;font-weight:600;">₦${Number(platformFee || 0).toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:10px 12px;color:#111111;font-weight:700;">Total Due</td>
+                        <td style="padding:10px 12px;color:#111111;font-weight:700;">₦${Number(totalAmount || 0).toLocaleString()}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;padding-top:12px;">
+                    <a href="${safePaymentLink}" style="display:inline-block;padding:10px 18px;border-radius:6px;background:#F5A623;color:#ffffff;text-decoration:none;font-weight:600;">Pay Now</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top:20px;text-align:left;color:#4b5563;line-height:1.6;">
+                    <p style="margin:0;">Thank you for using SmartMaint.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top:20px;text-align:center;color:#9CA3AF;font-size:12px;">© ${new Date().getFullYear()} SmartMaint</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+};
+
+export const paymentReceivedEmailTemplate = (clientName, requestTitle, amountPaid) => {
+  const name = clientName || 'there';
+  const safeRequestTitle = requestTitle || 'your maintenance request';
+
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+      </head>
+      <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+        <table role="presentation" style="width:100%;height:100%;background:#ffffff;">
+          <tr>
+            <td align="center">
+              <table role="presentation" style="max-width:600px;width:100%;margin:40px 16px;padding:24px;border-radius:8px;border:1px solid #f1f5f9;">
+                <tr>
+                  <td style="text-align:left;padding-bottom:16px;">
+                    <h1 style="margin:0;color:#111111;font-size:24px;">Payment Received - SmartMaint</h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:left;padding:12px 0;color:#4b5563;line-height:1.6;">
+                    <p style="margin:0 0 12px 0;">Hi ${name}, we’ve received your payment for '${safeRequestTitle}'.</p>
+                    <p style="margin:0 0 12px 0;">Amount paid: <strong>₦${Number(amountPaid || 0).toLocaleString()}</strong></p>
+                    <p style="margin:0;">Thank you for choosing SmartMaint.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top:20px;text-align:center;color:#9CA3AF;font-size:12px;">© ${new Date().getFullYear()} SmartMaint</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+};
+
 /**
  * Send an email using the configured transporter.
  * Errors are logged but not re-thrown so sending failures don't break main flows.

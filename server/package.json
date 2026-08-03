@@ -29,7 +29,8 @@
         "mongoose": "^7.5.0",
         "multer": "^2.2.0",
         "multer-storage-cloudinary": "^4.0.0",
-        "nodemailer": "^9.0.3"
+        "nodemailer": "^9.0.3",
+        "paystack": "^2.0.1"
     },
     "devDependencies": {
         "nodemon": "^3.0.1"

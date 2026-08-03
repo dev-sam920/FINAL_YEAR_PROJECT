@@ -54,6 +54,31 @@ const requestSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    jobCost: {
+      type: Number,
+      default: null,
+    },
+    platformFee: {
+      type: Number,
+      default: null,
+    },
+    totalAmount: {
+      type: Number,
+      default: null,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'pending', 'paid'],
+      default: 'unpaid',
+    },
+    paymentReference: {
+      type: String,
+      default: null,
+    },
+    paidAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

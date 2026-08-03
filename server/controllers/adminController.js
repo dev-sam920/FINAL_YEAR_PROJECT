@@ -295,6 +295,49 @@ export const getClientsAdmin = async (req, res) => {
   }
 };
 
+export const setRequestCost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { cost } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid request ID' });
+    }
+
+    const numericCost = Number(cost);
+    if (!Number.isFinite(numericCost) || numericCost < 0) {
+      return res.status(400).json({ message: 'Cost must be a non-negative number' });
+    }
+
+    const request = await Request.findById(id);
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    if (request.status !== 'completed') {
+      return res.status(400).json({ message: 'Only completed requests can receive a service cost' });
+    }
+
+    request.cost = numericCost;
+    request.paymentStatus = numericCost > 0 ? 'unpaid' : 'unpaid';
+    request.paymentReference = null;
+    request.paidAt = null;
+    await request.save();
+
+    await createNotification({
+      recipientId: request.client,
+      message: `Your completed request now has a service fee of ₦${numericCost} — please proceed to payment.`,
+      type: 'payment',
+      relatedRequest: request._id,
+    });
+
+    const updatedRequest = await Request.findById(id).populate('client', 'fullName email');
+    res.status(200).json({ message: 'Service cost set successfully', request: updatedRequest });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to set request cost' });
+  }
+};
+
 export const assignTechnician = async (req, res) => {
   try {
     const { id } = req.params;

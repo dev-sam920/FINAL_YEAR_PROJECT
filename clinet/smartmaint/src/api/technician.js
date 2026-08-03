@@ -11,8 +11,8 @@ export async function getMyAssignments(filters = {}) {
   return resp.data;
 }
 
-export async function updateRequestStatus(requestId, status, note) {
-  const resp = await axiosInstance.patch(`/technician/requests/${requestId}/status`, { status, note });
+export async function updateRequestStatus(requestId, status, note, jobCost) {
+  const resp = await axiosInstance.patch(`/technician/requests/${requestId}/status`, { status, note, jobCost });
   return resp.data;
 }
 

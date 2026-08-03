@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { initializePayment } from '../api/payments';
 import StatusTimeline from './StatusTimeline';
 
 const priorityBadgeStyles = {
@@ -51,6 +52,8 @@ const getPhotoUrl = (request) => {
 
 export default function RequestDetailsModal({ request, onClose, onRate }) {
   const [submittingRating, setSubmittingRating] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -79,6 +82,18 @@ export default function RequestDetailsModal({ request, onClose, onRate }) {
       await onRate(request, rating);
     } finally {
       setSubmittingRating(false);
+    }
+  };
+
+  const handlePayNow = async () => {
+    setPaying(true);
+    try {
+      const data = await initializePayment(request._id);
+      if (data?.authorizationUrl) {
+        window.location.href = data.authorizationUrl;
+      }
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -208,6 +223,66 @@ export default function RequestDetailsModal({ request, onClose, onRate }) {
             <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Date submitted</p>
             <p style={{ margin: '0.35rem 0 0', fontSize: 15, fontWeight: 600 }}>{dateSubmitted}</p>
           </div>
+
+          {isCompleted && (
+            <div>
+              <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Payment</p>
+              {typeof request.totalAmount === 'number' && request.totalAmount > 0 ? (
+                <div style={{ marginTop: '0.65rem', display: 'grid', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{ color: '#6B7280' }}>Service Cost</span>
+                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.jobCost || 0).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{ color: '#6B7280' }}>Platform Fee (10%)</span>
+                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.platformFee || 0).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, borderTop: '1px solid #E5E7EB', paddingTop: 8 }}>
+                    <span style={{ color: '#111111', fontWeight: 700 }}>Total</span>
+                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                    {request.paymentStatus === 'paid' ? (
+                      <>
+                        <span style={{ background: '#D1FAE5', color: '#065F46', padding: '0.35rem 0.75rem', borderRadius: 9999, fontSize: 12, fontWeight: 700 }}>
+                          Paid on {request.paidAt ? new Date(request.paidAt).toLocaleDateString() : 'recently'}
+                        </span>
+                        <button type="button" onClick={() => setShowReceipt((prev) => !prev)} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#0B2818', borderRadius: 9999, padding: '0.55rem 0.8rem', cursor: 'pointer', fontWeight: 700 }}>
+                          {showReceipt ? 'Hide Receipt' : 'View Receipt'}
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={handlePayNow} disabled={paying} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', borderRadius: 9999, padding: '0.6rem 0.9rem', cursor: 'pointer', fontWeight: 700 }}>
+                        {paying ? 'Redirecting...' : 'Pay Now'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p style={{ margin: '0.65rem 0 0', color: '#6B7280' }}>No service fee has been set yet.</p>
+              )}
+            </div>
+          )}
+
+          {showReceipt && request.paymentStatus === 'paid' && (
+            <div style={{ border: '1px solid #E5E7EB', borderRadius: 18, padding: '1rem', background: '#F9FAFB' }}>
+              <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Receipt summary</p>
+              <div style={{ marginTop: '0.6rem', display: 'grid', gap: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                  <span style={{ color: '#6B7280' }}>Amount</span>
+                  <span style={{ fontWeight: 700, color: '#111111' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                  <span style={{ color: '#6B7280' }}>Date paid</span>
+                  <span style={{ fontWeight: 700, color: '#111111' }}>{request.paidAt ? new Date(request.paidAt).toLocaleString() : 'Pending'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                  <span style={{ color: '#6B7280' }}>Reference</span>
+                  <span style={{ fontWeight: 700, color: '#111111' }}>{request.paymentReference || 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {isCompleted && (
             <div>

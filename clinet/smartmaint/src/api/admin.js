@@ -43,3 +43,8 @@ export async function assignTechnician(requestId, technicianId) {
   const resp = await axiosInstance.patch(`/admin/requests/${requestId}/assign`, { technicianId });
   return resp.data;
 }
+
+export async function setRequestCost(requestId, cost) {
+  const resp = await axiosInstance.patch(`/admin/requests/${requestId}/set-cost`, { cost });
+  return resp.data;
+}

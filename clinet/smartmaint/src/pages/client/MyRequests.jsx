@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { getMyRequests, rateRequest } from '../../api/requests';
+import { initializePayment } from '../../api/payments';
 import StatusTimeline from '../../components/StatusTimeline';
 import RequestDetailsModal from '../../components/RequestDetailsModal';
 import './MyRequests.css';
@@ -17,13 +18,32 @@ const getStatusLabel = (status) => statusLabelMap[status] || status || 'Submitte
 const getStatusSlug = (status) => (status || 'submitted').toLowerCase().replace(/\s+/g, '-');
 const getPrioritySlug = (priority) => (priority || 'medium').toLowerCase();
 
-const RequestCard = ({ request, onOpenDetails }) => {
+const RequestCard = ({ request, onOpenDetails, onPayNow }) => {
   const dateString = new Date(request.createdAt).toLocaleDateString();
   const prioritySlug = getPrioritySlug(request.priority);
   const statusSlug = getStatusSlug(request.status);
+  const isCompleted = statusSlug === 'completed';
+  const hasCost = typeof request.totalAmount === 'number' && request.totalAmount > 0;
+  const isPaid = request.paymentStatus === 'paid';
+
+  const handlePayClick = (event) => {
+    event.stopPropagation();
+    onPayNow(request);
+  };
 
   return (
-    <button type="button" className="request-card" onClick={() => onOpenDetails(request)}>
+    <div
+      className="request-card"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpenDetails(request)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpenDetails(request);
+        }
+      }}
+    >
       <div className="request-card-header">
         <div>
           <p className="request-card-title">{request.title || request.category || 'Maintenance Request'}</p>
@@ -38,7 +58,38 @@ const RequestCard = ({ request, onOpenDetails }) => {
       <div className="request-card-body">
         <StatusTimeline currentStatus={statusSlug} />
       </div>
-    </button>
+
+      {isCompleted && hasCost && (
+        <div className="payment-inline-card">
+          <div>
+            <div>
+              <p className="payment-inline-label">Service Cost</p>
+              <p className="payment-inline-value">₦{Number(request.jobCost || 0).toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="payment-inline-label">Platform Fee</p>
+              <p className="payment-inline-value">₦{Number(request.platformFee || 0).toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="payment-inline-label">Total</p>
+              <p className="payment-inline-value">₦{Number(request.totalAmount || 0).toLocaleString()}</p>
+            </div>
+          </div>
+          {isPaid ? (
+            <div className="payment-inline-actions">
+              <span className="payment-pill paid">Paid</span>
+              <button type="button" className="payment-link-btn" onClick={(event) => { event.stopPropagation(); onOpenDetails(request); }}>
+                View Receipt
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="payment-action-btn" onClick={handlePayClick}>
+              Pay Now
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -101,6 +152,18 @@ export default function MyRequests() {
     }
   };
 
+  const handlePayNow = async (request) => {
+    try {
+      const data = await initializePayment(request._id);
+      if (data?.authorizationUrl) {
+        window.location.href = data.authorizationUrl;
+      }
+    } catch (err) {
+      console.error('Failed to initialize payment', err);
+      setError(err.message || 'Unable to start payment');
+    }
+  };
+
   return (
     <main className="my-requests-page">
       <div className="my-requests-container">
@@ -155,7 +218,7 @@ export default function MyRequests() {
         ) : (
           <div className="request-list">
             {filtered.map((request) => (
-              <RequestCard key={request._id} request={request} onOpenDetails={openDetails} />
+              <RequestCard key={request._id} request={request} onOpenDetails={openDetails} onPayNow={handlePayNow} />
             ))}
           </div>
         )}
