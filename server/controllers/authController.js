@@ -23,17 +23,18 @@ const generateToken = (userId, role) => {
  * @param {string} token - JWT token
  */
 const setTokenCookie = (res, token) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
 
   console.log('[auth-cookie] setting token cookie', {
+    vercelEnv: process.env.VERCEL_ENV,
     nodeEnv: process.env.NODE_ENV,
     isProduction,
   });
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
@@ -285,7 +286,8 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user._id, user.role);
-    console.log('DEBUG - NODE_ENV value:', process.env.NODE_ENV, 'Type:', typeof process.env.NODE_ENV);
+    const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
+    console.log('DEBUG - VERCEL_ENV:', process.env.VERCEL_ENV, 'NODE_ENV:', process.env.NODE_ENV, 'isProduction:', isProduction);
     setTokenCookie(res, token);
 
     res.status(200).json({
@@ -306,15 +308,18 @@ export const login = async (req, res) => {
  */
 export const logout = async (req, res) => {
   try {
+    const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
+
     console.log('[auth-cookie] clearing token cookie', {
+      vercelEnv: process.env.VERCEL_ENV,
       nodeEnv: process.env.NODE_ENV,
-      isProduction: process.env.NODE_ENV === 'production',
+      isProduction,
     });
 
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     });
 
     res.status(200).json({

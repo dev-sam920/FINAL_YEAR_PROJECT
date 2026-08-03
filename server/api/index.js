@@ -1,6 +1,4 @@
 import 'dotenv/config';
-import fs from 'fs';
-import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -60,27 +58,6 @@ const createApp = async () => {
     res.status(200).json({
       status: 'ok',
       message: 'SmartMaint API is running',
-    });
-  });
-
-  app.get('/api/debug-env-file', (req, res) => {
-    const envPath = path.join(process.cwd(), '.env');
-    const exists = fs.existsSync(envPath);
-    let content = null;
-
-    if (exists) {
-      try {
-        content = fs.readFileSync(envPath, 'utf-8');
-      } catch (e) {
-        content = 'Could not read: ' + e.message;
-      }
-    }
-
-    res.json({
-      cwd: process.cwd(),
-      envFileExists: exists,
-      envFileContent: content,
-      nodeEnvRightNow: process.env.NODE_ENV,
     });
   });
 
