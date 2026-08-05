@@ -54,3 +54,26 @@ export async function rateRequest(requestId, rating) {
     throw new Error(error.message || 'An error occurred while rating the request');
   }
 }
+
+export async function setRequestEmojiFeedback(requestId, emojiFeedback) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/requests/${requestId}/emoji-feedback`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ emojiFeedback }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to save emoji feedback');
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message || 'An error occurred while saving emoji feedback');
+  }
+}

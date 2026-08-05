@@ -45,6 +45,7 @@ export const initializePayment = async (req, res) => {
       return res.status(400).json({ message: 'A valid client email is required for payment' });
     }
 
+    const clientUrl = process.env.CLIENT_URL ? String(process.env.CLIENT_URL).replace(/\/+$/, '') : 'http://localhost:5173';
     const amountInKobo = Math.round(totalAmount * 100);
     const paystackResponse = await fetch(`${PAYSTACK_BASE_URL}/transaction/initialize`, {
       method: 'POST',
@@ -53,6 +54,7 @@ export const initializePayment = async (req, res) => {
         email: client.email,
         amount: amountInKobo,
         reference: `${Date.now()}-${request._id}`,
+        callback_url: `${clientUrl}/payment-callback`,
         metadata: {
           requestId: request._id.toString(),
           clientName: client.fullName || client.email,
@@ -61,6 +63,7 @@ export const initializePayment = async (req, res) => {
     });
 
     const paystackPayload = await paystackResponse.json();
+    console.debug('Paystack initialize response:', paystackPayload);
 
     if (!paystackResponse.ok || !paystackPayload.status) {
       console.error('Paystack init failed:', paystackPayload);
@@ -71,6 +74,15 @@ export const initializePayment = async (req, res) => {
     request.paymentReference = paystackPayload.data.reference;
     request.paidAt = null;
     await request.save();
+
+    console.debug('Payment initialized for request:', {
+      requestId: request._id.toString(),
+      paymentReference: request.paymentReference,
+      paymentStatus: request.paymentStatus,
+      totalAmount: request.totalAmount,
+      jobCost: request.jobCost,
+      platformFee: request.platformFee,
+    });
 
     res.status(200).json({
       message: 'Payment initialized successfully',
@@ -111,6 +123,7 @@ export const verifyPayment = async (req, res) => {
     });
 
     const paystackPayload = await paystackResponse.json();
+    console.debug('Paystack verify response:', paystackPayload);
 
     if (!paystackResponse.ok || !paystackPayload.status) {
       console.error('Paystack verify failed:', paystackPayload);
@@ -151,5 +164,21 @@ export const verifyPayment = async (req, res) => {
   } catch (error) {
     console.error('Payment verification error:', error);
     res.status(500).json({ message: error.message || 'Failed to verify payment' });
+  }
+};
+
+export const getMyPayments = async (req, res) => {
+  try {
+    const payments = await Request.find({
+      client: req.user.id,
+      paymentStatus: { $in: ['paid', 'unpaid'] },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json({ payments });
+  } catch (error) {
+    console.error('Load payments error:', error);
+    res.status(500).json({ message: error.message || 'Failed to load payment history' });
   }
 };

@@ -39,6 +39,11 @@ export async function getClients() {
   return resp.data;
 }
 
+export async function getAdminPayments() {
+  const resp = await axiosInstance.get('/admin/payments');
+  return resp.data;
+}
+
 export async function assignTechnician(requestId, technicianId) {
   const resp = await axiosInstance.patch(`/admin/requests/${requestId}/assign`, { technicianId });
   return resp.data;

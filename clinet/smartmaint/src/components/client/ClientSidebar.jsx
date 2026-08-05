@@ -80,6 +80,13 @@ export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav })
           <span className="client-nav-text">My Requests</span>
         </button>
         <button
+          className={`client-nav-item ${activeNav === 'payments' ? 'active' : ''}`}
+          onClick={() => handleNavClick('payments', '/payments')}
+        >
+          <span className="client-nav-icon">💳</span>
+          <span className="client-nav-text">Payments</span>
+        </button>
+        <button
           className={`client-nav-item ${activeNav === 'submit' ? 'active' : ''}`}
           onClick={() => handleNavClick('submit', '/submit-request')}
         >

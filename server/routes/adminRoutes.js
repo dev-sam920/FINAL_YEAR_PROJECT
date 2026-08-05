@@ -9,6 +9,7 @@ import {
   getClientsAdmin,
   assignTechnician,
   reviewTechnicianApplication,
+  getAdminPayments,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use(protect, authorize('admin'));
 
 router.get('/stats', getAdminStats);
 router.get('/requests', getAllRequestsAdmin);
+router.get('/payments', getAdminPayments);
 router.get('/technicians', getTechniciansAdmin);
 router.get('/technicians/pending', getPendingTechniciansAdmin);
 router.post('/technicians', createTechnician);

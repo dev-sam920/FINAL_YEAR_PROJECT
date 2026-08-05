@@ -66,6 +66,11 @@ const requestSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    emojiFeedback: {
+      type: String,
+      enum: ['angry', 'confused', 'neutral', 'happy', 'love', null],
+      default: null,
+    },
     paymentStatus: {
       type: String,
       enum: ['unpaid', 'pending', 'paid'],

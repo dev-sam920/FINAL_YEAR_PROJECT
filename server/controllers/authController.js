@@ -1,7 +1,9 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { sendEmail, welcomeEmailTemplate } from '../config/emailConfig.js';
 import { getUploadedAssetUrl } from '../config/cloudinary.js';
+import { adminAuth } from '../config/firebaseAdmin.js';
 
 /**
  * Generate JWT token
@@ -242,6 +244,69 @@ export const technicianSignup = async (req, res) => {
  * Login a user
  * POST /api/auth/login
  */
+export const googleAuth = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: 'Google ID token is required' });
+    }
+
+    if (!adminAuth) {
+      return res.status(500).json({ message: 'Firebase Admin SDK is not configured' });
+    }
+
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const email = String(decodedToken.email || '').trim().toLowerCase();
+    const fullName = String(decodedToken.name || '').trim();
+    const profilePicture = decodedToken.picture || '';
+
+    if (!email) {
+      return res.status(400).json({ message: 'Google account email is required' });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (user.role === 'client') {
+        const token = generateToken(user._id, user.role);
+        setTokenCookie(res, token);
+        return res.status(200).json({ message: 'Google login successful', user: buildUserResponse(user, req), token });
+      }
+
+      return res.status(400).json({ message: 'This email is already registered with a different account type. Please use manual login.' });
+    }
+
+    const randomPassword = crypto.randomBytes(24).toString('hex');
+    user = await User.create({
+      fullName: fullName || email.split('@')[0],
+      email,
+      password: randomPassword,
+      role: 'client',
+      accountStatus: 'approved',
+      profilePicture,
+    });
+
+    const token = generateToken(user._id, user.role);
+    setTokenCookie(res, token);
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Welcome to SmartMaint!',
+        html: welcomeEmailTemplate(user.fullName),
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email for Google sign-in:', emailError);
+    }
+
+    return res.status(201).json({ message: 'Google sign-in successful', user: buildUserResponse(user, req), token });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ message: error.message || 'Google sign-in failed' });
+  }
+};
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

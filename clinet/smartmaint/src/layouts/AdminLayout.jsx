@@ -7,6 +7,7 @@ import './admin.css';
 const pathToNav = {
   '/admin-dashboard': 'dashboard',
   '/admin/requests': 'requests',
+  '/admin/payments': 'payments',
   '/admin/technicians': 'technicians',
   '/admin/clients': 'clients',
 };
@@ -50,6 +51,7 @@ export default function AdminLayout({ children }) {
         <nav className="admin-nav">
           <NavLink className={`admin-nav-link ${active === 'dashboard' ? 'active' : ''}`} to="/admin-dashboard" onClick={closeMenu}>Dashboard</NavLink>
           <NavLink className={`admin-nav-link ${active === 'requests' ? 'active' : ''}`} to="/admin/requests" onClick={closeMenu}>All Requests</NavLink>
+          <NavLink className={`admin-nav-link ${active === 'payments' ? 'active' : ''}`} to="/admin/payments" onClick={closeMenu}>Payments</NavLink>
           <NavLink className={`admin-nav-link ${active === 'technicians' ? 'active' : ''}`} to="/admin/technicians" onClick={closeMenu}>Technicians</NavLink>
           <NavLink className={`admin-nav-link ${active === 'clients' ? 'active' : ''}`} to="/admin/clients" onClick={closeMenu}>Clients</NavLink>
         </nav>

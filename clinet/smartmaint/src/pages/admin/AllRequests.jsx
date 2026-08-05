@@ -187,7 +187,7 @@ export default function AllRequests() {
                       <div style={{ fontWeight: 700, color: '#111111' }}>{r.title}</div>
                       <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{r._id?.slice(-6) || 'N/A'}</div>
                     </td>
-                    <td style={tdStyle}>{r.client?.fullName || r.clientName || 'Unknown'}</td>
+                    <td style={tdStyle}>{r.client?.fullName || r.client?.email || r.clientName || 'Unknown'}</td>
                     <td style={tdStyle}>{r.category || 'General'}</td>
                     <td style={tdStyle}><span style={{ ...badgeBase, ...getPriorityBadgeStyle(r.priority) }}>{r.priority || 'Low'}</span></td>
                     <td style={tdStyle}><span style={{ ...badgeBase, ...getStatusBadgeStyle(r.status) }}>{getStatusLabel(r.status)}</span></td>

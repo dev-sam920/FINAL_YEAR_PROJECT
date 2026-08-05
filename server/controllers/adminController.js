@@ -66,20 +66,30 @@ export const getAllRequestsAdmin = async (req, res) => {
         .sort({ createdAt: -1 })
         .lean();
 
-      const requests = requestsAll.filter((r) => {
-        if (regex.test(r.title || '')) return true;
-        if (r.client && regex.test(r.client.fullName || '')) return true;
-        return false;
-      });
+      const requests = requestsAll
+        .filter((r) => {
+          if (regex.test(r.title || '')) return true;
+          if (r.client && regex.test(r.client.fullName || '')) return true;
+          return false;
+        })
+        .map((request) => ({
+          ...request,
+          clientName: request.client?.fullName || request.clientName || null,
+        }));
 
       return res.status(200).json({ requests });
     }
 
-    const requests = await Request.find(filter)
+    let requests = await Request.find(filter)
       .populate('client', 'fullName email')
       .populate('assignedTechnician', 'fullName')
       .sort({ createdAt: -1 })
       .lean();
+
+    requests = requests.map((request) => ({
+      ...request,
+      clientName: request.client?.fullName || request.clientName || null,
+    }));
 
     res.status(200).json({ requests });
   } catch (error) {
@@ -90,6 +100,50 @@ export const getAllRequestsAdmin = async (req, res) => {
       response: error.response,
     });
     res.status(500).json({ message: error.message || 'Failed to load requests' });
+  }
+};
+
+export const getAdminPayments = async (req, res) => {
+  try {
+    const payments = await Request.find({
+      paymentStatus: { $in: ['paid', 'unpaid'] },
+      jobCost: { $ne: null },
+    })
+      .populate('client', 'fullName email')
+      .populate('assignedTechnician', 'fullName')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const paidRequests = payments.filter((payment) => payment.paymentStatus === 'paid');
+    const unpaidWithCost = payments.filter(
+      (payment) => payment.paymentStatus === 'unpaid' && Number(payment.totalAmount) > 0
+    );
+
+    const totalRevenue = paidRequests.reduce(
+      (sum, payment) => sum + (Number(payment.platformFee) || 0),
+      0
+    );
+    const totalTransactionValue = paidRequests.reduce(
+      (sum, payment) => sum + (Number(payment.totalAmount) || 0),
+      0
+    );
+    const pendingPaymentsCount = unpaidWithCost.length;
+
+    res.status(200).json({
+      payments,
+      summary: {
+        totalRevenue,
+        totalTransactionValue,
+        pendingPaymentsCount,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to load admin payments:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
+    res.status(500).json({ message: error.message || 'Failed to load admin payments' });
   }
 };
 

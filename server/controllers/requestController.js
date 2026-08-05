@@ -2,6 +2,8 @@ import Request from '../models/Request.js';
 import User from '../models/User.js';
 import { createNotification } from './notificationController.js';
 
+const ALLOWED_EMOJI_FEEDBACK = ['angry', 'confused', 'neutral', 'happy', 'love'];
+
 /**
  * Create a new client maintenance request
  * POST /api/requests
@@ -38,6 +40,13 @@ export const createRequest = async (req, res) => {
 
     res.status(201).json({ request });
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      console.error('❌ Request validation error:', error);
+      return res.status(400).json({
+        message: 'Something went wrong while saving your request. Please try again.',
+      });
+    }
+
     res.status(500).json({
       message: error.message || 'Failed to create request',
     });
@@ -103,6 +112,47 @@ export const rateRequest = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.message || 'Failed to update request rating',
+    });
+  }
+};
+
+export const setEmojiFeedback = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emojiFeedback } = req.body;
+
+    if (!emojiFeedback || !ALLOWED_EMOJI_FEEDBACK.includes(emojiFeedback)) {
+      return res.status(400).json({
+        message: 'emojiFeedback must be one of: angry, confused, neutral, happy, love',
+      });
+    }
+
+    const request = await Request.findById(id);
+    if (!request) {
+      return res.status(404).json({
+        message: 'Request not found',
+      });
+    }
+
+    if (request.client.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: 'You are not authorized to update emoji feedback for this request',
+      });
+    }
+
+    if (request.status !== 'completed') {
+      return res.status(400).json({
+        message: 'Emoji feedback can only be submitted for completed requests',
+      });
+    }
+
+    request.emojiFeedback = emojiFeedback;
+    await request.save();
+
+    res.status(200).json({ request });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || 'Failed to update emoji feedback',
     });
   }
 };

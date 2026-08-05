@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import connectDB from '../config/db.js';
 import authRoutes from '../routes/authRoutes.js';
 import requestRoutes from '../routes/requestRoutes.js';
@@ -76,6 +77,13 @@ const createApp = async () => {
   });
 
   app.use((err, req, res, next) => {
+    if (err.name === 'ValidationError' || err instanceof mongoose.Error.ValidationError) {
+      console.error('❌ Mongoose validation error:', err);
+      return res.status(400).json({
+        message: 'Something went wrong while saving your request. Please try again.',
+      });
+    }
+
     console.error('❌ Error:', err.message);
     res.status(err.status || 500).json({
       message: err.message || 'Internal server error',

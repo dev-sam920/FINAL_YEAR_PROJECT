@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { initializePayment } from '../api/payments';
+import { setRequestEmojiFeedback } from '../api/requests';
 import StatusTimeline from './StatusTimeline';
 
 const priorityBadgeStyles = {
@@ -50,10 +51,18 @@ const getPhotoUrl = (request) => {
   return null;
 };
 
-export default function RequestDetailsModal({ request, onClose, onRate }) {
+export default function RequestDetailsModal({ request, onClose, onRate, onEmojiFeedback }) {
   const [submittingRating, setSubmittingRating] = useState(false);
+  const [emojiSubmitting, setEmojiSubmitting] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState(request?.emojiFeedback || null);
+  const [emojiSaved, setEmojiSaved] = useState(Boolean(request?.emojiFeedback));
   const [paying, setPaying] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
+
+  useEffect(() => {
+    setSelectedEmoji(request?.emojiFeedback || null);
+    setEmojiSaved(Boolean(request?.emojiFeedback));
+  }, [request?.emojiFeedback]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -82,6 +91,24 @@ export default function RequestDetailsModal({ request, onClose, onRate }) {
       await onRate(request, rating);
     } finally {
       setSubmittingRating(false);
+    }
+  };
+
+  const handleEmojiSelect = async (emoji) => {
+    if (emojiSaved) return;
+    setEmojiSubmitting(true);
+
+    try {
+      const data = await setRequestEmojiFeedback(request._id, emoji);
+      setSelectedEmoji(data.request.emojiFeedback);
+      setEmojiSaved(true);
+      if (typeof onEmojiFeedback === 'function') {
+        onEmojiFeedback(request, data.request);
+      }
+    } catch (error) {
+      console.error('Failed to save emoji feedback', error);
+    } finally {
+      setEmojiSubmitting(false);
     }
   };
 
@@ -319,6 +346,51 @@ export default function RequestDetailsModal({ request, onClose, onRate }) {
                   ))}
                 </div>
               )}
+
+              <div style={{ marginTop: 18 }}>
+                <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>How did it feel?</p>
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  {[
+                    { emoji: '😡', value: 'angry' },
+                    { emoji: '😕', value: 'confused' },
+                    { emoji: '😐', value: 'neutral' },
+                    { emoji: '🙂', value: 'happy' },
+                    { emoji: '😍', value: 'love' },
+                  ].map((option) => {
+                    const isSelected = selectedEmoji === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleEmojiSelect(option.value)}
+                        disabled={emojiSaved || emojiSubmitting}
+                        aria-label={option.value}
+                        style={{
+                          width: 54,
+                          height: 54,
+                          borderRadius: 18,
+                          border: isSelected ? '2px solid #0B2818' : '1px solid #E5E7EB',
+                          background: isSelected ? '#DCFCE7' : '#F8FAFC',
+                          cursor: emojiSaved ? 'not-allowed' : 'pointer',
+                          fontSize: 24,
+                          transform: isSelected ? 'scale(1.06)' : 'scale(1)',
+                          transition: 'all 0.15s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {option.emoji}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedEmoji && (
+                  <p style={{ margin: '0.75rem 0 0', color: '#0B2818', fontSize: 13, fontWeight: 700 }}>
+                    Selected: {selectedEmoji === 'angry' ? 'Angry' : selectedEmoji === 'confused' ? 'Confused' : selectedEmoji === 'neutral' ? 'Neutral' : selectedEmoji === 'happy' ? 'Happy' : 'Love'}
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>

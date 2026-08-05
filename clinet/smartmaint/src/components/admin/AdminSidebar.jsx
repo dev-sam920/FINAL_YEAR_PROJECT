@@ -6,6 +6,7 @@ export default function AdminSidebar({ activeNav, setActiveNav }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', path: '/admin-dashboard' },
     { id: 'requests', label: 'All Requests', path: '/admin/requests' },
+    { id: 'payments', label: 'Payments', path: '/admin/payments' },
     { id: 'technicians', label: 'Technicians', path: '/admin/technicians' },
     { id: 'clients', label: 'Clients', path: '/admin/clients' },
   ];

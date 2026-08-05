@@ -152,6 +152,11 @@ export default function MyRequests() {
     }
   };
 
+  const handleEmojiFeedback = async (request, updatedRequest) => {
+    setRequests((prev) => prev.map((item) => (item._id === request._id ? updatedRequest : item)));
+    setSelectedRequest((prev) => (prev && prev._id === request._id ? updatedRequest : prev));
+  };
+
   const handlePayNow = async (request) => {
     try {
       const data = await initializePayment(request._id);
@@ -225,7 +230,7 @@ export default function MyRequests() {
       </div>
 
       {isModalOpen && (
-        <RequestDetailsModal request={selectedRequest} onClose={closeDetails} onRate={handleRating} />
+        <RequestDetailsModal request={selectedRequest} onClose={closeDetails} onRate={handleRating} onEmojiFeedback={handleEmojiFeedback} />
       )}
     </main>
   );

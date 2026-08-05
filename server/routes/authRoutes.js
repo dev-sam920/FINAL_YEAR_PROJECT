@@ -1,5 +1,5 @@
 import express from 'express';
-import { signup, technicianSignup, login, logout, getMe } from '../controllers/authController.js';
+import { signup, technicianSignup, login, googleAuth, logout, getMe } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { createUploadMiddleware } from '../config/cloudinary.js';
 
@@ -33,6 +33,7 @@ router.post('/technician-signup', upload.fields([
   { name: 'idDocument', maxCount: 1 },
 ]), technicianSignup);
 router.post('/login', login);
+router.post('/google', googleAuth);
 
 /**
  * Protected routes

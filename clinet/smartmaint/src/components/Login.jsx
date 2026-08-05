@@ -1,8 +1,10 @@
 import { useState, useContext } from 'react';
+import { signInWithPopup } from 'firebase/auth';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { loginUser } from '../api/auth';
+import { googleAuth, loginUser } from '../api/auth';
 import { AuthContext } from '../context/AuthContext';
 import heroImage from '../assets/hero.png';
+import { auth, googleProvider } from './firebase';
 import './css/Login.css';
 
 export default function Login() {
@@ -37,6 +39,28 @@ export default function Login() {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      const response = await googleAuth(idToken);
+
+      if (response?.user) {
+        setUser(response.user);
+        navigate('/client-dashboard');
+      } else {
+        setError('Google sign-in failed. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'Google sign-in failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -92,7 +116,7 @@ export default function Login() {
         <div className="login-form-container">
           <h2 className="login-title">Welcome Back</h2>
 
-          <button className="btn-google-login" type="button">
+          <button className="btn-google-login" type="button" onClick={handleGoogleSignIn} disabled={loading}>
             <svg className="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>

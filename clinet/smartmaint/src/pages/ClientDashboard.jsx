@@ -178,6 +178,11 @@ export default function ClientDashboard() {
     }
   };
 
+  const handleEmojiFeedback = async (request, updatedRequest) => {
+    setRequests((prev) => prev.map((item) => (item._id === request._id ? updatedRequest : item)));
+    setSelectedRequest((prev) => (prev && prev._id === request._id ? updatedRequest : prev));
+  };
+
   const openDetails = (request) => {
     setSelectedRequest(request);
     setIsModalOpen(true);
@@ -277,7 +282,7 @@ export default function ClientDashboard() {
       </div>
 
       {isModalOpen && (
-        <RequestDetailsModal request={selectedRequest} onClose={closeDetails} onRate={handleRating} />
+        <RequestDetailsModal request={selectedRequest} onClose={closeDetails} onRate={handleRating} onEmojiFeedback={handleEmojiFeedback} />
       )}
     </main>
   );

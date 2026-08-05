@@ -9,12 +9,14 @@ import Profile from './pages/client/Profile';
 import Support from './pages/client/Support';
 import MyRequests from './pages/client/MyRequests';
 import PaymentCallback from './pages/client/PaymentCallback';
+import Payments from './pages/client/Payments';
 import ClientLayout from './layouts/ClientLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AllRequests from './pages/admin/AllRequests';
+import PaymentsAdmin from './pages/admin/Payments';
 import Technicians from './pages/admin/Technicians';
 import Clients from './pages/admin/Clients';
 import TechnicianLayout from './layouts/TechnicianLayout';
@@ -56,6 +58,16 @@ const App = () => {
               <ProtectedRoute>
                 <ClientLayout>
                   <MyRequests />
+                </ClientLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payments"
+            element={
+              <ProtectedRoute>
+                <ClientLayout>
+                  <Payments />
                 </ClientLayout>
               </ProtectedRoute>
             }
@@ -127,6 +139,16 @@ const App = () => {
               <ProtectedRoute roles={["admin"]}>
                 <AdminLayout>
                   <AllRequests />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminLayout>
+                  <PaymentsAdmin />
                 </AdminLayout>
               </ProtectedRoute>
             }

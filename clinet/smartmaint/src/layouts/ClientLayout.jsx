@@ -5,6 +5,7 @@ import './ClientLayout.css';
 
 const pathToNav = {
   '/client-dashboard': 'dashboard',
+  '/payments': 'payments',
   '/profile': 'profile',
   '/settings': 'settings',
   '/support': 'support',
