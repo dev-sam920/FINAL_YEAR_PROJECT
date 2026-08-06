@@ -1,18 +1,22 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import ClientDashboard from './pages/ClientDashboard';
 import SubmitRequest from './pages/client/SubmitRequest';
 import Profile from './pages/client/Profile';
+import CompleteProfile from './pages/client/CompleteProfile';
 import Support from './pages/client/Support';
 import MyRequests from './pages/client/MyRequests';
 import PaymentCallback from './pages/client/PaymentCallback';
 import Payments from './pages/client/Payments';
 import ClientLayout from './layouts/ClientLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ClientProtectedRoute from './components/ClientProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import { LoadingProvider, useLoading } from './context/LoadingContext.jsx';
+import SplashScreen from './components/SplashScreen.jsx';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AllRequests from './pages/admin/AllRequests';
@@ -22,12 +26,15 @@ import Clients from './pages/admin/Clients';
 import TechnicianLayout from './layouts/TechnicianLayout';
 import TechnicianDashboard from './pages/technician/TechnicianDashboard';
 import MyAssignments from './pages/technician/MyAssignments';
+import TechnicianWithdraw from './pages/technician/TechnicianWithdraw';
 import TechnicianProfile from './pages/technician/Profile';
 
 const App = () => {
   return (
     <Router>
-      <AuthProvider>
+      <LoadingProvider>
+        <AuthProvider>
+          <SplashController />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
@@ -35,61 +42,69 @@ const App = () => {
           <Route
             path="/client-dashboard"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <ClientDashboard />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
             }
           />
           <Route
             path="/submit-request"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <SubmitRequest />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
             }
           />
           <Route
             path="/my-requests"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <MyRequests />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
             }
           />
           <Route
             path="/payments"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <Payments />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
             }
           />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <Profile />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
             }
           />
           <Route
             path="/support"
             element={
-              <ProtectedRoute>
+              <ClientProtectedRoute>
                 <ClientLayout>
                   <Support />
                 </ClientLayout>
-              </ProtectedRoute>
+              </ClientProtectedRoute>
+            }
+          />
+          <Route
+            path="/client/complete-profile"
+            element={
+              <ClientProtectedRoute allowIncomplete>
+                <CompleteProfile />
+              </ClientProtectedRoute>
             }
           />
           <Route path="/payment-callback" element={<PaymentCallback />} />
@@ -119,6 +134,16 @@ const App = () => {
               <ProtectedRoute roles={["technician"]}>
                 <TechnicianLayout>
                   <MyAssignments />
+                </TechnicianLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/technician/withdraw"
+            element={
+              <ProtectedRoute roles={["technician"]}>
+                <TechnicianLayout>
+                  <TechnicianWithdraw />
                 </TechnicianLayout>
               </ProtectedRoute>
             }
@@ -175,9 +200,23 @@ const App = () => {
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
+      </LoadingProvider>
     </Router>
   );
 };
 
 export default App;
+
+function SplashController() {
+  const { showSplash } = useLoading();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (showSplash) setVisible(true);
+    else requestAnimationFrame(() => setVisible(false));
+  }, [showSplash]);
+
+  if (!visible) return null;
+  return <SplashScreen />;
+}
