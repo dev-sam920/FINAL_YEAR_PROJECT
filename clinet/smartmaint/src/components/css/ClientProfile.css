@@ -244,7 +244,7 @@ body {
 }
 
 .camera-icon-label:hover {
-  background-color: #0a1f15;
+  background-color: #0F1642;
   transform: scale(1.05);
 }
 
@@ -261,7 +261,7 @@ body {
 .btn-save-changes {
   width: 100%;
   padding: 14px 32px;
-  background-color: #0D2B1D;
+  background-color: #4285F4;
   color: white;
   border: none;
   border-radius: 9999px;
@@ -275,7 +275,7 @@ body {
 }
 
 .btn-save-changes:hover {
-  background-color: #0a1f15;
+  background-color: #0F1642;
   transform: scale(1.01);
 }
 

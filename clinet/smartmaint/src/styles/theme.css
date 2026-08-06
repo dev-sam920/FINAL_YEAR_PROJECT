@@ -2,11 +2,14 @@
   --sm-background: #ffffff;
   --sm-surface: #F7F7F5;
   --sm-surface-alt: #F7F7F5;
+  /* Primary navy used in sidebars and branding */
+  --sm-navy: #0f1642;
+  --sm-navy-alt: #101a4a;
   --sm-border: #E5E7EB;
   --sm-text: #111111;
   --sm-muted: #6B7280;
-  --sm-accent: #0B2818;
-  --sm-accent-strong: #0E3B24;
+  --sm-accent: #4285F4;
+  --sm-accent-strong: #2563EB;
   --sm-shadow: rgba(0, 0, 0, 0.08);
   --sm-danger: #DC2626;
   --sm-success: #059669;

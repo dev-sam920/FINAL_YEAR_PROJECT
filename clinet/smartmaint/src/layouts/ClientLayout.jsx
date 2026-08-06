@@ -32,9 +32,9 @@ export default function ClientLayout({ children }) {
               aria-label="Search"
             />
           </div>
-          <div className="client-topbar-actions">
+          {/* <div className="client-topbar-actions">
             <NotificationBell />
-          </div>
+          </div> */}
         </header>
         <main className="client-content">{children}</main>
       </div>

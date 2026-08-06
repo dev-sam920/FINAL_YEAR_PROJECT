@@ -11,6 +11,7 @@ import adminRoutes from '../routes/adminRoutes.js';
 import supportRoutes from '../routes/supportRoutes.js';
 import technicianRoutes from '../routes/technicianRoutes.js';
 import notificationRoutes from '../routes/notificationRoutes.js';
+import clientRoutes from '../routes/clientRoutes.js';
 import paymentRoutes from '../routes/paymentRoutes.js';
 
 const app = express();
@@ -68,6 +69,7 @@ const createApp = async () => {
   app.use('/api/users', userRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/support', supportRoutes);
+  app.use('/api/client', clientRoutes);
   app.use('/api/technician', technicianRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/payments', paymentRoutes);

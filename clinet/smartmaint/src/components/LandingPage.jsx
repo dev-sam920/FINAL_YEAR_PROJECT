@@ -5,16 +5,22 @@ import { ClipboardList, UserCheck, CheckCircle } from 'lucide-react';
 export default function LandingPage() {
   const navigate = useNavigate();
 
+  const scrollToSection = (id, e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <>
       <nav>
         <div className="nav-container">
           <div className="nav-logo">SmartMaint</div>
           <div className="nav-menu">
-            <a className="nav-link active" href="#">Home</a>
-            <a className="nav-link" href="#">Features</a>
-            <a className="nav-link" href="#">About</a>
-            <a className="nav-link" href="#">Contact</a>
+            <a className="nav-link active" href="#home" onClick={(e) => scrollToSection('home', e)}>Home</a>
+            <a className="nav-link" href="#features" onClick={(e) => scrollToSection('features', e)}>Features</a>
+            <a className="nav-link" href="#about" onClick={(e) => scrollToSection('about', e)}>About</a>
+            <a className="nav-link" href="#contact" onClick={(e) => scrollToSection('contact', e)}>Contact</a>
           </div>
           <div className="nav-buttons">
             <button className="nav-button nav-button-login" onClick={() => navigate('/login')}>Login</button>
@@ -24,7 +30,7 @@ export default function LandingPage() {
       </nav>
 
       <main>
-        <section className="hero-section">
+        <section id="home" className="hero-section">
           <div className="hero-grid">
             <div className="hero-content">
               <div className="capsule-label">Property Maintenance Platform</div>
@@ -70,7 +76,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="section-services">
+        <section id="features" className="section-services">
           <div className="container-max">
             <div className="section-header">
               <div className="section-header-left">
@@ -148,7 +154,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="section-timeline">
+        <section id="about" className="section-timeline">
           <div className="timeline-header">
             <div className="capsule-label">Methodology</div>
             <h2 className="section-title mt-6">The Intelligent Flow</h2>
@@ -157,7 +163,7 @@ export default function LandingPage() {
           <div className="timeline-steps">
             <div className="timeline-step">
               <div className="timeline-image">
-                <div className="timeline-icon"><ClipboardList size={48} color="#0B2818" /></div>
+                <div className="timeline-icon"><ClipboardList size={48} color="#4285F4" /></div>
               </div>
               <div className="timeline-content">
                 <span className="timeline-number">01</span>
@@ -168,7 +174,7 @@ export default function LandingPage() {
 
             <div className="timeline-step">
               <div className="timeline-image">
-                <div className="timeline-icon"><UserCheck size={48} color="#0B2818" /></div>
+                <div className="timeline-icon"><UserCheck size={48} color="#4285F4" /></div>
               </div>
               <div className="timeline-content">
                 <span className="timeline-number">02</span>
@@ -179,7 +185,7 @@ export default function LandingPage() {
 
             <div className="timeline-step">
               <div className="timeline-image">
-                <div className="timeline-icon"><CheckCircle size={48} color="#0B2818" /></div>
+                <div className="timeline-icon"><CheckCircle size={48} color="#4285F4" /></div>
               </div>
               <div className="timeline-content">
                 <span className="timeline-number">03</span>
@@ -253,7 +259,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer>
+      <footer id="contact">
         <div className="footer-container">
           <div className="footer-grid">
             <div className="footer-brand">

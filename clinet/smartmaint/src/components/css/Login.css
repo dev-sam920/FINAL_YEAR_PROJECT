@@ -1,15 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined');
+@import '../../styles/theme.css';
 
 :root {
-  --primary: #001b0f;
+  --primary: #4285F4;
   --on-primary: #ffffff;
-  --primary-container: #013220;
-  --on-primary-container: #6f9c84;
-  --secondary: #775a19;
+  --primary-container: #0f1642;
+  --on-primary-container: #ffffff;
+  --secondary: #0f1642;
   --on-secondary: #ffffff;
-  --secondary-container: #fed488;
-  --secondary-fixed-dim: #e9c176;
+  --secondary-container: #4285F4;
+  --secondary-fixed-dim: #4285F4;
   --surface: #faf9f8;
   --surface-container-low: #f4f3f2;
   --on-surface: #1a1c1c;
@@ -33,7 +34,7 @@ body {
   padding: 0;
   border: none !important;
   outline: none !important;
-  background-color: #e8e3db;
+  background-color: #F5F7FA;
 }
 
 #root {
@@ -88,7 +89,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: #e8e3db;
+  background-color: #F5F7FA;
   padding: 20px;
 }
 
@@ -108,7 +109,7 @@ textarea:focus {
   flex-direction: column;
   justify-content: space-between;
   padding: 16px;
-  background-color: #faf9f8;
+  background-color: #FFFFFF;
   z-index: 10;
   position: relative;
   overflow-y: auto;
@@ -153,7 +154,7 @@ textarea:focus {
   font-size: 24px;
   line-height: 1.3;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--sm-navy);
   letter-spacing: -0.02em;
 }
 
@@ -194,7 +195,7 @@ textarea:focus {
   font-size: 28px;
   line-height: 1.2;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--sm-navy);
   margin-bottom: 24px;
   letter-spacing: -0.02em;
 }
@@ -552,7 +553,7 @@ textarea:focus {
 }
 
 .forgot-link:hover {
-  color: var(--secondary);
+  color: #2a63d9; /* slightly darker blue on hover */
 }
 
 /* Sign In Button */
@@ -560,21 +561,21 @@ textarea:focus {
   width: 100%;
   padding: 16px;
   margin-top: 8px;
-  background-color: var(--primary);
+  background-color: var(--sm-navy);
   border: none;
   border-radius: 100px;
-  color: white;
+  color: var(--on-primary);
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.18s ease, transform 0.18s ease;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 .btn-sign-in:hover {
-  background-color: rgba(0, 27, 15, 0.9);
+  background-color: #2a63d9; /* subtle darker blue */
   transform: scale(1.02);
 }
 
@@ -619,7 +620,7 @@ textarea:focus {
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--primary);
   text-decoration: none;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -629,7 +630,7 @@ textarea:focus {
 }
 
 .footer-link:hover {
-  color: var(--primary);
+  color: #2a63d9;
 }
 
 .footer-icon {
@@ -691,7 +692,7 @@ textarea:focus {
 .login-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(15, 36, 21, 0.2), transparent);
+  background: linear-gradient(to top, rgba(15,22,66,0.45), rgba(66,133,244,0.12));
   z-index: 2;
 }
 
@@ -709,7 +710,7 @@ textarea:focus {
 .caption-divider {
   height: 1px;
   width: 48px;
-  background-color: var(--secondary);
+  background: linear-gradient(90deg, var(--primary), var(--primary-container));
   margin-bottom: 24px;
 }
 

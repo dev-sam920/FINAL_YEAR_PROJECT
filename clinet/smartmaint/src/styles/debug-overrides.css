@@ -1,0 +1,20 @@
+/* Temporary debug overrides to disable full-screen overlays that may block interaction during debugging.
+   Remove this file and its import from main.jsx after testing. */
+
+/* Disable pointer events for known overlay/backdrop classes */
+.modal-overlay,
+.admin-mobile-backdrop,
+.signup-overlay,
+.login-overlay,
+.service-overlay,
+.portfolio-overlay,
+.sm-splash-root,
+.admin-mobile-backdrop {
+  pointer-events: none !important;
+  background: transparent !important;
+}
+
+/* Ensure dropdowns and buttons remain clickable */
+button, input, select, textarea, .client-sidebar, .client-topbar, .form-card {
+  pointer-events: auto !important;
+}

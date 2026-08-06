@@ -28,7 +28,7 @@ export default function AdminSidebar({ activeNav, setActiveNav }) {
             style={{
               padding: 10,
               borderRadius: 8,
-              background: activeNav === item.id ? '#F5A623' : 'transparent',
+              background: activeNav === item.id ? '#4285F4' : 'transparent',
               color: '#111111',
               textAlign: 'left',
               border: 'none',

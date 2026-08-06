@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 export async function updateProfile({ fullName, phone, unitAddress, address, state, specialty, lga }) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/profile`, {
+    const response = await fetch(`${API_BASE_URL}/client/profile`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

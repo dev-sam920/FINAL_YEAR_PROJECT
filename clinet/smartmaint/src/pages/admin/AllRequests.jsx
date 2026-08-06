@@ -110,7 +110,7 @@ export default function AllRequests() {
       <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: '1.2rem 1.3rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div>
-            <p style={{ margin: 0, color: '#0B2818', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Admin workspace</p>
+            <p style={{ margin: 0, color: '#4285F4', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Admin workspace</p>
             <h1 style={{ margin: '0.25rem 0 0', fontSize: '1.55rem', color: '#111111' }}>All Requests</h1>
             <p style={{ margin: '0.25rem 0 0', color: '#6B7280' }}>Search, review, and assign maintenance work with a calmer workflow.</p>
           </div>
@@ -121,7 +121,7 @@ export default function AllRequests() {
               onChange={(e) => setSearch(e.target.value)}
               style={{ minWidth: 240, border: '1px solid #E5E7EB', background: '#F7F7F5', borderRadius: 9999, padding: '0.7rem 0.95rem', color: '#111111' }}
             />
-            <button onClick={applyFilters} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', borderRadius: 9999, padding: '0.7rem 1rem', fontWeight: 700, cursor: 'pointer' }}>Search</button>
+            <button onClick={applyFilters} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', borderRadius: 9999, padding: '0.7rem 1rem', fontWeight: 700, cursor: 'pointer' }}>Search</button>
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function AllRequests() {
               key={value || 'all'}
               type="button"
               onClick={() => setFilters((prev) => ({ ...prev, status: value }))}
-              style={{ border: 'none', background: filters.status === value ? '#0B2818' : '#F7F7F5', color: filters.status === value ? '#FFFFFF' : '#4B5563', borderRadius: 9999, padding: '0.6rem 0.9rem', fontWeight: 700, cursor: 'pointer' }}
+              style={{ border: 'none', background: filters.status === value ? '#4285F4' : '#F7F7F5', color: filters.status === value ? '#FFFFFF' : '#4B5563', borderRadius: 9999, padding: '0.6rem 0.9rem', fontWeight: 700, cursor: 'pointer' }}
             >
               {value ? getStatusLabel(value) : 'All'}
             </button>
@@ -156,7 +156,7 @@ export default function AllRequests() {
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
-          <button onClick={applyFilters} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', borderRadius: 9999, padding: '0.7rem 1rem', fontWeight: 700, cursor: 'pointer' }}>Apply filters</button>
+          <button onClick={applyFilters} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', borderRadius: 9999, padding: '0.7rem 1rem', fontWeight: 700, cursor: 'pointer' }}>Apply filters</button>
         </div>
       </div>
 
@@ -192,15 +192,48 @@ export default function AllRequests() {
                     <td style={tdStyle}><span style={{ ...badgeBase, ...getPriorityBadgeStyle(r.priority) }}>{r.priority || 'Low'}</span></td>
                     <td style={tdStyle}><span style={{ ...badgeBase, ...getStatusBadgeStyle(r.status) }}>{getStatusLabel(r.status)}</span></td>
                     <td style={tdStyle}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <select value={selectedAssign[r._id] || ''} onChange={(e) => setSelectedAssign((s) => ({ ...s, [r._id]: e.target.value }))} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', borderRadius: 9999, padding: '0.55rem 0.7rem', color: '#111111' }}>
-                          <option value="">Unassigned</option>
-                          {technicians.map((t) => (
-                            <option key={t._id} value={t._id}>{t.fullName}</option>
-                          ))}
-                        </select>
-                        <button onClick={() => confirmAssign(r._id)} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', borderRadius: 9999, padding: '0.55rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Assign</button>
-                      </div>
+                      {r.assignedTechnician ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{ color: '#111111', fontWeight: 600 }}>{r.assignedTechnician.fullName || 'Assigned'}</span>
+                          <button
+                            type="button"
+                            disabled
+                            style={{
+                              border: 'none',
+                              background: '#E5E7EB',
+                              color: '#6B7280',
+                              borderRadius: 9999,
+                              padding: '0.55rem 0.8rem',
+                              fontWeight: 700,
+                              cursor: 'not-allowed',
+                              opacity: 0.7,
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            Assigned
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <select
+                            value={selectedAssign[r._id] || ''}
+                            onChange={(e) => setSelectedAssign((s) => ({ ...s, [r._id]: e.target.value }))}
+                            style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', borderRadius: 9999, padding: '0.55rem 0.7rem', color: '#111111' }}
+                          >
+                            <option value="">Unassigned</option>
+                            {technicians.map((t) => (
+                              <option key={t._id} value={t._id}>{t.fullName}</option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => confirmAssign(r._id)}
+                            style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', borderRadius: 9999, padding: '0.55rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            Assign
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

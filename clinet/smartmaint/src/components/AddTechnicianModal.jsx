@@ -96,7 +96,7 @@ export default function AddTechnicianModal({ isOpen, onClose, onCreated }) {
             <button
               type="submit"
               disabled={loading}
-              style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}
+              style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}
             >
               {loading ? 'Creating...' : 'Create Technician'}
             </button>

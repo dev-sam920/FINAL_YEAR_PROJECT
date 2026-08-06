@@ -68,6 +68,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: 'General',
     },
+    phoneNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
     profileCompleted: {
       type: Boolean,
       default: false,
@@ -93,6 +102,31 @@ const userSchema = new mongoose.Schema(
     passwordChanged: {
       type: Boolean,
       default: false,
+    },
+    bankName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    accountNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    accountName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    bankCode: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    paystackRecipientCode: {
+      type: String,
+      trim: true,
+      default: '',
     },
   },
   { timestamps: true }

@@ -307,9 +307,9 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-color: #0D2B1D;
+  background-color: #0F1642;
   color: white;
-  border: 2px solid #0D2B1D;
+  border: 2px solid #0F1642;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -321,8 +321,8 @@ body {
 }
 
 .profile-avatar:hover {
-  background-color: #0a1f15;
-  border-color: #0a1f15;
+  background-color: #0F1642;
+  border-color: #0F1642;
   transform: scale(1.05);
 }
 

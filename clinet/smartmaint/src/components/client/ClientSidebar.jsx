@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav }) {
   const navigate = useNavigate();
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, logout } = useContext(AuthContext);
 
   const getInitials = () => {
     const name = user?.fullName || user?.email;
@@ -54,59 +54,61 @@ export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav })
     }
   };
 
+  const navSections = [
+    {
+      title: '',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', route: '/client-dashboard', icon: '🏠' },
+      ],
+    },
+    {
+      title: 'Requests',
+      items: [
+        { id: 'requests', label: 'My Requests', route: '/my-requests', icon: '📋' },
+        { id: 'submit', label: 'Submit Request', route: '/submit-request', icon: '➕' },
+      ],
+    },
+    {
+      title: 'Payments',
+      items: [
+        { id: 'payments', label: 'Payments', route: '/payments', icon: '💳' },
+      ],
+    },
+    {
+      title: 'Account',
+      items: [
+        { id: 'profile', label: 'Profile', route: '/profile', icon: '👤' },
+        { id: 'support', label: 'Support', route: '/support', icon: '❓' },
+      ],
+    },
+  ];
+
   return (
     <aside className="client-sidebar">
       <div className="sidebar-brand">
         <div className="sidebar-brand-icon">SM</div>
         <div className="sidebar-brand-copy">
-          <div className="sidebar-brand-title"></div>
-          <div className="sidebar-brand-subtitle"></div>
+          <div className="sidebar-brand-title">SmartMaint</div>
+          <div className="sidebar-brand-subtitle">  </div>
         </div>
       </div>
 
       <nav className="client-sidebar-nav">
-        <button
-          className={`client-nav-item ${activeNav === 'dashboard' ? 'active' : ''}`}
-          onClick={() => handleNavClick('dashboard', '/client-dashboard')}
-        >
-          <span className="client-nav-icon">🏠</span>
-          <span className="client-nav-text">Dashboard</span>
-        </button>
-        <button
-          className={`client-nav-item ${activeNav === 'requests' ? 'active' : ''}`}
-          onClick={() => handleNavClick('requests', '/my-requests')}
-        >
-          <span className="client-nav-icon">📋</span>
-          <span className="client-nav-text">My Requests</span>
-        </button>
-        <button
-          className={`client-nav-item ${activeNav === 'payments' ? 'active' : ''}`}
-          onClick={() => handleNavClick('payments', '/payments')}
-        >
-          <span className="client-nav-icon">💳</span>
-          <span className="client-nav-text">Payments</span>
-        </button>
-        <button
-          className={`client-nav-item ${activeNav === 'submit' ? 'active' : ''}`}
-          onClick={() => handleNavClick('submit', '/submit-request')}
-        >
-          <span className="client-nav-icon">➕</span>
-          <span className="client-nav-text">Submit Request</span>
-        </button>
-        <button
-          className={`client-nav-item ${activeNav === 'profile' ? 'active' : ''}`}
-          onClick={() => handleNavClick('profile', '/profile')}
-        >
-          <span className="client-nav-icon">👤</span>
-          <span className="client-nav-text">Profile</span>
-        </button>
-        <button
-          className={`client-nav-item ${activeNav === 'support' ? 'active' : ''}`}
-          onClick={() => handleNavClick('support', '/support')}
-        >
-          <span className="client-nav-icon">❓</span>
-          <span className="client-nav-text">Support</span>
-        </button>
+        {navSections.map((section) => (
+          <div key={section.title} className="client-nav-section">
+            <div className="client-nav-section-title">{section.title}</div>
+            {section.items.map((item) => (
+              <button
+                key={item.id}
+                className={`client-nav-item ${activeNav === item.id ? 'active' : ''}`}
+                onClick={() => handleNavClick(item.id, item.route)}
+              >
+                <span className="client-nav-icon">{item.icon}</span>
+                <span className="client-nav-text">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        ))}
       </nav>
 
       <div className="client-sidebar-footer">
@@ -121,11 +123,7 @@ export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav })
         <button
           className="client-sidebar-logout"
           onClick={() => {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            navigate('/login');
+            logout();
           }}
         >
           <span className="client-logout-icon">🚪</span>

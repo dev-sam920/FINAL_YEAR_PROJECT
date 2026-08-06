@@ -28,7 +28,7 @@
 .admin-kpi-value {
   font-size: 36px;
   font-weight: 800;
-  color: #0B2818;
+  color: #0F1642;
   line-height: 1;
   margin-bottom: 8px;
 }
@@ -86,7 +86,7 @@
 
 .admin-tab.active {
   color: #FFFFFF;
-  background: #0B2818;
+  background: #4285F4;
 }
 
 .admin-tab-count {
@@ -189,7 +189,7 @@
 
 .request-id {
   font-weight: 600;
-  color: #0D2B1D;
+  color: #0F1642;
   font-family: 'Monaco', 'Courier New', monospace;
 }
 
@@ -381,15 +381,15 @@
 }
 
 .admin-pagination button:hover:not(:disabled) {
-  background-color: #0B2818;
+  background-color: #4285F4;
   color: white;
-  border-color: #0B2818;
+  border-color: #4285F4;
 }
 
 .admin-pagination button.active {
-  background-color: #0B2818;
+  background-color: #4285F4;
   color: white;
-  border-color: #0B2818;
+  border-color: #4285F4;
 }
 
 .admin-pagination button:disabled {
@@ -511,20 +511,20 @@
 }
 
 .technician-card:hover {
-  border-color: #0D2B1D;
+  border-color: #0F1642;
 }
 
 .technician-card.selected {
-  background-color: #0D2B1D;
+  background-color: #0F1642;
   color: white;
-  border-color: #0D2B1D;
+  border-color: #0F1642;
 }
 
 .tech-avatar {
   width: 48px;
   height: 48px;
   background-color: white;
-  color: #0D2B1D;
+  color: #0F1642;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -598,7 +598,7 @@
 
 .btn-assign {
   padding: 10px 24px;
-  background-color: #0D2B1D;
+  background-color: #4285F4;
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -609,7 +609,7 @@
 }
 
 .btn-assign:hover:not(:disabled) {
-  background-color: #0A1F15;
+  background-color: #2563EB;
 }
 
 .btn-assign:disabled {

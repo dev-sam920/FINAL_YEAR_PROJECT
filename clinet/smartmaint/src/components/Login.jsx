@@ -52,7 +52,15 @@ export default function Login() {
 
       if (response?.user) {
         setUser(response.user);
-        navigate('/client-dashboard');
+        if (response.user.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (response.user.role === 'technician') {
+          navigate('/technician-dashboard');
+        } else if (!response.user.profileCompleted) {
+          navigate('/client/complete-profile');
+        } else {
+          navigate('/client-dashboard');
+        }
       } else {
         setError('Google sign-in failed. Please try again.');
       }
@@ -92,6 +100,8 @@ export default function Login() {
           navigate('/admin-dashboard');
         } else if (response.user.role === 'technician') {
           navigate('/technician-dashboard');
+        } else if (!response.user.profileCompleted) {
+          navigate('/client/complete-profile');
         } else {
           navigate('/client-dashboard');
         }

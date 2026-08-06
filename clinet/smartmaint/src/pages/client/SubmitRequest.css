@@ -47,7 +47,7 @@ body {
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
-  background-color: #0B2818;
+  background-color: #0f1642;
   color: #ffffff;
   font-size: 12px;
   font-weight: 700;
@@ -131,6 +131,8 @@ body {
   box-shadow: 0 22px 48px var(--sm-shadow);
   padding: 36px;
   margin: 0 32px 40px;
+  position: relative;
+  z-index: 1200;
 }
 
 .message-banner {
@@ -192,14 +194,36 @@ select.form-input {
   color: var(--sm-text);
   background-color: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .form-input:focus,
 .form-textarea:focus,
 select.form-input:focus {
   outline: none;
-  border-color: #0B2818;
-  box-shadow: 0 0 0 4px rgba(11, 40, 24, 0.15);
+  border-color: #4285F4;
+  box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.18);
+}
+
+select.form-input {
+  cursor: pointer;
+  min-height: 48px;
+  padding-right: 16px;
+  appearance: auto;
+  -webkit-appearance: menulist-button;
+  -moz-appearance: none;
+}
+
+.form-input,
+select.form-input {
+  pointer-events: auto;
+}
+
+.btn-submit-new {
+  position: relative;
+  z-index: 1;
 }
 
 .form-input.error,
@@ -232,12 +256,12 @@ select.form-input:focus {
 }
 
 .priority-button:hover {
-  border-color: #0B2818;
+  border-color: #4285F4;
 }
 
 .priority-button.active {
-  background-color: rgba(11, 40, 24, 0.18);
-  border-color: #0B2818;
+  background-color: rgba(66, 133, 244, 0.18);
+  border-color: #4285F4;
 }
 
 .photo-upload-area {
@@ -254,7 +278,7 @@ select.form-input:focus {
 }
 
 .photo-upload-area:hover {
-  border-color: #0B2818;
+  border-color: #4285F4;
   background-color: #ffffff;
 }
 
@@ -308,7 +332,7 @@ select.form-input:focus {
   padding: 16px 18px;
   border: none;
   border-radius: 18px;
-  background-color: #0B2818;
+  background-color: #4285F4;
   color: #ffffff;
   font-size: 15px;
   font-weight: 700;
@@ -318,7 +342,7 @@ select.form-input:focus {
 
 .btn-submit-new:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 28px rgba(11, 40, 24, 0.22);
+  box-shadow: 0 10px 28px rgba(66, 133, 244, 0.22);
 }
 
 .btn-submit-new:disabled {

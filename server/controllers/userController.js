@@ -11,6 +11,12 @@ export const buildUserResponse = (user, req) => {
     return asset;
   };
 
+  const addressValue = user.unitAddress || user.address || '';
+  const profileCompletionStatus = Boolean(
+    user.profileCompleted ||
+    (user.fullName && user.phone && addressValue && user.state && user.lga)
+  );
+
   return {
     _id: user._id?.toString?.() || user._id,
     id: user._id?.toString?.() || user._id,
@@ -23,6 +29,8 @@ export const buildUserResponse = (user, req) => {
     state: user.state || '',
     lga: user.lga || '',
     specialty: user.specialty || 'General',
+    profileCompleted: profileCompletionStatus,
+    isProfileComplete: profileCompletionStatus,
     passwordChanged: user.passwordChanged ?? false,
     profilePicture: normalizeAssetUrl(user.profilePicture),
   };
@@ -48,6 +56,17 @@ export const updateProfile = async (req, res) => {
     user.state = state?.trim() || '';
     user.lga = lga?.trim() || '';
     user.specialty = specialty?.trim() || 'General';
+
+    const profileCompletionStatus = Boolean(
+      user.fullName &&
+      user.phone &&
+      (user.unitAddress || user.address) &&
+      user.state &&
+      user.lga
+    );
+
+    user.profileCompleted = profileCompletionStatus;
+    user.isProfileComplete = profileCompletionStatus;
 
     await user.save();
 

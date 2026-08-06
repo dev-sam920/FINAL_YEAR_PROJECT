@@ -1,5 +1,6 @@
 import Request from '../models/Request.js';
 import User from '../models/User.js';
+import { getUploadedAssetUrl } from '../config/cloudinary.js';
 import { createNotification } from './notificationController.js';
 
 const ALLOWED_EMOJI_FEEDBACK = ['angry', 'confused', 'neutral', 'happy', 'love'];
@@ -11,8 +12,16 @@ const ALLOWED_EMOJI_FEEDBACK = ['angry', 'confused', 'neutral', 'happy', 'love']
 export const createRequest = async (req, res) => {
   try {
     const { title, category, priority, description, location, photos } = req.body;
+    const normalizedTitle = (title || '').trim();
+    const normalizedCategory = (category || '').trim();
+    const normalizedDescription = (description || '').trim();
+    const normalizedLocation = (location || '').trim();
+    const photoUrl = req.file ? getUploadedAssetUrl(req.file) : null;
+    const resolvedPhotos = photoUrl
+      ? [photoUrl]
+      : (Array.isArray(photos) ? photos.filter(Boolean) : []);
 
-    if (!title || !category || !description) {
+    if (!normalizedTitle || !normalizedCategory || !normalizedDescription) {
       return res.status(400).json({
         message: 'Please provide title, category, and description',
       });
@@ -20,12 +29,12 @@ export const createRequest = async (req, res) => {
 
     const request = await Request.create({
       client: req.user.id,
-      title,
-      category,
+      title: normalizedTitle,
+      category: normalizedCategory,
       priority: priority || 'Medium',
-      description,
-      location: location || '',
-      photos: Array.isArray(photos) ? photos : [],
+      description: normalizedDescription,
+      location: normalizedLocation,
+      photos: resolvedPhotos,
     });
 
     const admins = await User.find({ role: 'admin' }).select('_id');

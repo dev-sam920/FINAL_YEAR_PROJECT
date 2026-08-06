@@ -5,10 +5,10 @@ import { AuthContext } from '../context/AuthContext';
 const getFallbackPath = (role) => {
   if (role === 'admin') return '/admin-dashboard';
   if (role === 'technician') return '/technician-dashboard';
-  return '/client-dashboard';
+  return '/login';
 };
 
-export default function ProtectedRoute({ children, roles }) {
+export default function ClientProtectedRoute({ children, allowIncomplete = false }) {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) {
@@ -33,8 +33,12 @@ export default function ProtectedRoute({ children, roles }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (roles && roles.length > 0 && !roles.includes(user.role)) {
+  if (user.role !== 'client') {
     return <Navigate to={getFallbackPath(user.role)} replace />;
+  }
+
+  if (!allowIncomplete && !user.profileCompleted) {
+    return <Navigate to="/client/complete-profile" replace />;
   }
 
   return children;

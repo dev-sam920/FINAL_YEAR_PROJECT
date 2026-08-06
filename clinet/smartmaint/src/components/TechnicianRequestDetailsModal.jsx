@@ -8,7 +8,7 @@ const priorityBadgeStyles = {
 };
 
 const statusBadgeStyles = {
-  submitted: { background: '#0B2818', color: '#FFFFFF' },
+  submitted: { background: '#4285F4', color: '#FFFFFF' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },

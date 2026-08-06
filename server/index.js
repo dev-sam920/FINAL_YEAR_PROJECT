@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -11,6 +12,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import technicianRoutes from './routes/technicianRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import clientRoutes from './routes/clientRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 
 // Environment variables are loaded via import 'dotenv/config' at top
@@ -89,9 +91,16 @@ const createApp = async () => {
     app.use('/api/users', userRoutes);
     app.use('/api/admin', adminRoutes);
     app.use('/api/support', supportRoutes);
+    app.use('/api/client', clientRoutes);
     app.use('/api/technician', technicianRoutes);
     app.use('/api/notifications', notificationRoutes);
     app.use('/api/payments', paymentRoutes);
+
+    /**
+     * Serve uploaded local files directly when cloudinary is unavailable.
+     * This allows idDocument URLs like /uploads/technician-documents/... to work.
+     */
+    app.use('/uploads', express.static(path.resolve('uploads')));
 
     /**
      * 404 handler - for undefined routes

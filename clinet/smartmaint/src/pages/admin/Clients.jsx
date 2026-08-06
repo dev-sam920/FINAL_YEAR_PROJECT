@@ -19,7 +19,7 @@ export default function Clients() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: '1.2rem 1.3rem' }}>
-        <p style={{ margin: 0, color: '#0B2818', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Client directory</p>
+        <p style={{ margin: 0, color: '#4285F4', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Client directory</p>
         <h1 style={{ margin: '0.25rem 0 0', fontSize: '1.55rem', color: '#111111' }}>Clients</h1>
         <p style={{ margin: '0.25rem 0 0', color: '#6B7280' }}>A calm view of client accounts and contact details.</p>
       </div>

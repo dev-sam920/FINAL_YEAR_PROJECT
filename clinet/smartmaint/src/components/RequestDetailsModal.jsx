@@ -10,7 +10,7 @@ const priorityBadgeStyles = {
 };
 
 const statusBadgeStyles = {
-  submitted: { background: '#0B2818', color: '#FFFFFF' },
+  submitted: { background: '#4285F4', color: '#FFFFFF' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -258,15 +258,15 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                 <div style={{ marginTop: '0.65rem', display: 'grid', gap: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ color: '#6B7280' }}>Service Cost</span>
-                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.jobCost || 0).toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.jobCost || 0).toLocaleString()}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ color: '#6B7280' }}>Platform Fee (10%)</span>
-                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.platformFee || 0).toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.platformFee || 0).toLocaleString()}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, borderTop: '1px solid #E5E7EB', paddingTop: 8 }}>
                     <span style={{ color: '#111111', fontWeight: 700 }}>Total</span>
-                    <span style={{ fontWeight: 700, color: '#0B2818' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
                     {request.paymentStatus === 'paid' ? (
@@ -274,12 +274,12 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                         <span style={{ background: '#D1FAE5', color: '#065F46', padding: '0.35rem 0.75rem', borderRadius: 9999, fontSize: 12, fontWeight: 700 }}>
                           Paid on {request.paidAt ? new Date(request.paidAt).toLocaleDateString() : 'recently'}
                         </span>
-                        <button type="button" onClick={() => setShowReceipt((prev) => !prev)} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#0B2818', borderRadius: 9999, padding: '0.55rem 0.8rem', cursor: 'pointer', fontWeight: 700 }}>
+                        <button type="button" onClick={() => setShowReceipt((prev) => !prev)} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#4285F4', borderRadius: 9999, padding: '0.55rem 0.8rem', cursor: 'pointer', fontWeight: 700 }}>
                           {showReceipt ? 'Hide Receipt' : 'View Receipt'}
                         </button>
                       </>
                     ) : (
-                      <button type="button" onClick={handlePayNow} disabled={paying} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', borderRadius: 9999, padding: '0.6rem 0.9rem', cursor: 'pointer', fontWeight: 700 }}>
+                      <button type="button" onClick={handlePayNow} disabled={paying} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', borderRadius: 9999, padding: '0.6rem 0.9rem', cursor: 'pointer', fontWeight: 700 }}>
                         {paying ? 'Redirecting...' : 'Pay Now'}
                       </button>
                     )}
@@ -317,7 +317,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
               {hasRating ? (
                 <div style={{ marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} style={{ color: star <= request.rating ? '#0B2818' : '#E5E7EB', fontSize: 22 }}>
+                    <span key={star} style={{ color: star <= request.rating ? '#4285F4' : '#E5E7EB', fontSize: 22 }}>
                       ★
                     </span>
                   ))}
@@ -337,7 +337,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                         background: 'transparent',
                         cursor: submittingRating ? 'default' : 'pointer',
                         fontSize: 22,
-                        color: '#0B2818',
+                        color: '#4285F4',
                         padding: 0,
                       }}
                     >
@@ -369,7 +369,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                           width: 54,
                           height: 54,
                           borderRadius: 18,
-                          border: isSelected ? '2px solid #0B2818' : '1px solid #E5E7EB',
+                          border: isSelected ? '2px solid #4285F4' : '1px solid #E5E7EB',
                           background: isSelected ? '#DCFCE7' : '#F8FAFC',
                           cursor: emojiSaved ? 'not-allowed' : 'pointer',
                           fontSize: 24,
@@ -386,7 +386,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                   })}
                 </div>
                 {selectedEmoji && (
-                  <p style={{ margin: '0.75rem 0 0', color: '#0B2818', fontSize: 13, fontWeight: 700 }}>
+                  <p style={{ margin: '0.75rem 0 0', color: '#4285F4', fontSize: 13, fontWeight: 700 }}>
                     Selected: {selectedEmoji === 'angry' ? 'Angry' : selectedEmoji === 'confused' ? 'Confused' : selectedEmoji === 'neutral' ? 'Neutral' : selectedEmoji === 'happy' ? 'Happy' : 'Love'}
                   </p>
                 )}

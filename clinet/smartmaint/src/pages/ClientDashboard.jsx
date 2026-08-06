@@ -6,13 +6,13 @@ import StatusTimeline from '../components/StatusTimeline';
 import RequestDetailsModal from '../components/RequestDetailsModal';
 
 const priorityBadgeStyles = {
-  Low: { background: '#ECFCCB', color: '#166534' },
-  Medium: { background: '#FDE68A', color: '#92400E' },
-  High: { background: '#FED7D7', color: '#991B1B' },
+  Low: { background: '#E8F1FF', color: '#2563EB' },
+  Medium: { background: '#E8F1FF', color: '#2563EB' },
+  High: { background: '#E8F1FF', color: '#2563EB' },
 };
 
 const statusBadgeStyles = {
-  submitted: { background: '#0B2818', color: '#FFFFFF' },
+  submitted: { background: '#0F1642', color: '#FFFFFF' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -106,7 +106,7 @@ const RequestCard = ({ request, onRate, onOpenDetails }) => {
                     background: 'transparent',
                     cursor: 'pointer',
                     fontSize: 18,
-                    color: '#0B2818',
+                    color: '#4285F4',
                   }}
                 >
                   ★
@@ -116,7 +116,7 @@ const RequestCard = ({ request, onRate, onOpenDetails }) => {
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} style={{ color: star <= request.rating ? '#0B2818' : '#E5E7EB', fontSize: 18 }}>
+                <span key={star} style={{ color: star <= request.rating ? '#4285F4' : '#E5E7EB', fontSize: 18 }}>
                   ★
                 </span>
               ))}
@@ -168,6 +168,13 @@ export default function ClientDashboard() {
     [requests]
   );
 
+  const statCards = [
+    { label: 'Total Requests', value: stats.total, icon: '📋', color: '#4285F4' },
+    { label: 'Pending', value: stats.pending, icon: '⏳', color: '#34A853' },
+    { label: 'In Progress', value: stats.inProgress, icon: '⚙️', color: '#F59E0B' },
+    { label: 'Completed', value: stats.completed, icon: '✅', color: '#4285F4' },
+  ];
+
   const handleRating = async (request, rating) => {
     try {
       const data = await rateRequest(request._id, rating);
@@ -193,8 +200,16 @@ export default function ClientDashboard() {
     setSelectedRequest(null);
   };
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const handleSubmitNewRequest = () => {
+    navigate('/submit-request');
+  };
+
   return (
-    <main style={{ minHeight: '100vh', background: '#FFFFFF', color: '#111111', padding: '2rem' }}>
+    <main style={{ minHeight: '100vh', background: '#F4F7FB', color: '#111111', padding: '2rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
@@ -208,7 +223,7 @@ export default function ClientDashboard() {
           </div>
           <button
             type="button"
-            onClick={logout}
+            onClick={handleLogout}
             style={{
               background: '#111111',
               color: '#FFFFFF',
@@ -224,17 +239,17 @@ export default function ClientDashboard() {
         </section>
 
         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '1rem' }}>
-          {[
-            { label: 'Total Requests', value: stats.total },
-            { label: 'Pending', value: stats.pending },
-            { label: 'In Progress', value: stats.inProgress },
-            { label: 'Completed', value: stats.completed },
-          ].map((card) => (
-            <div key={card.label} style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 10px 24px rgba(17, 17, 17, 0.06)' }}>
-              <p style={{ margin: 0, color: '#6B7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                {card.label}
-              </p>
-              <p style={{ margin: '0.85rem 0 0', fontSize: '2rem', fontWeight: 700, color: '#111111' }}>{card.value}</p>
+          {statCards.map((card) => (
+            <div key={card.label} style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid #E5E7EB', padding: '1.2rem', boxShadow: '0 10px 24px rgba(17, 17, 17, 0.06)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${card.color}22`, color: card.color, fontSize: 22 }}>
+                {card.icon}
+              </div>
+              <div>
+                <p style={{ margin: 0, color: '#6B7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  {card.label}
+                </p>
+                <p style={{ margin: '0.55rem 0 0', fontSize: '1.6rem', fontWeight: 700, color: '#111111' }}>{card.value}</p>
+              </div>
             </div>
           ))}
         </section>
@@ -246,9 +261,9 @@ export default function ClientDashboard() {
           </div>
           <button
             type="button"
-            onClick={() => navigate('/submit-request')}
+            onClick={handleSubmitNewRequest}
             style={{
-              background: '#0B2818',
+              background: '#4285F4',
               color: '#ffffff',
               border: 'none',
               borderRadius: 9999,
@@ -265,9 +280,9 @@ export default function ClientDashboard() {
           {loading ? (
             <div style={{ padding: '3rem 0', textAlign: 'center', color: '#6B7280' }}>Loading your requests...</div>
           ) : error ? (
-            <div style={{ padding: '1.5rem', borderRadius: 20, background: '#FEF3C7', color: '#92400E' }}>{error}</div>
+            <div style={{ padding: '1.5rem', borderRadius: 20, background: '#E8F1FF', color: '#2563EB' }}>{error}</div>
           ) : requests.length === 0 ? (
-            <div style={{ padding: '2.5rem', borderRadius: 20, background: '#F8FAFC', color: '#111111', textAlign: 'center' }}>
+            <div style={{ padding: '2.5rem', borderRadius: 20, background: '#FFFFFF', color: '#111111', textAlign: 'center', border: '1px solid #E5E7EB' }}>
               <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>No requests yet</p>
               <p style={{ margin: '0.75rem 0 0', color: '#6B7280' }}>Submit your first request to get started.</p>
             </div>

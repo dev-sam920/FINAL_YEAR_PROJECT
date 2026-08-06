@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Bell } from 'lucide-react';
 import { getNotifications, getUnreadCount, markAllAsRead, markAsRead } from '../api/notifications';
 
+const POLL_INTERVAL_MS = 60_000;
+
 const relativeTime = (dateString) => {
   const diff = Date.now() - new Date(dateString).getTime();
   const minutes = Math.max(1, Math.round(diff / 60000));
@@ -46,7 +48,7 @@ export default function NotificationBell() {
 
     const interval = setInterval(() => {
       loadUnreadCount();
-    }, 20000);
+    }, POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);
@@ -113,18 +115,18 @@ export default function NotificationBell() {
       >
         <Bell size={18} />
         {hasUnread && (
-          <span style={{ position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 999, background: '#0B2818', color: '#FFFFFF', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
+          <span style={{ position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 999, background: '#4285F4', color: '#FFFFFF', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 10px)', width: 320, maxHeight: 420, overflowY: 'auto', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 16, boxShadow: '0 16px 40px rgba(17,17,17,0.14)', zIndex: 100 }}>
+        <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 10px)', width: 320, maxHeight: 420, overflowY: 'auto', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 16, boxShadow: '0 16px 40px rgba(17,17,17,0.14)', zIndex: 2000 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.9rem 1rem', borderBottom: '1px solid #F3F4F6' }}>
             <div style={{ fontWeight: 800, color: '#111111' }}>Notifications</div>
             {notifications.some((item) => !item.isRead) && (
-              <button type="button" onClick={handleMarkAllAsRead} style={{ border: 'none', background: 'transparent', color: '#0B2818', fontWeight: 700, cursor: 'pointer', padding: 0 }}>
+              <button type="button" onClick={handleMarkAllAsRead} style={{ border: 'none', background: 'transparent', color: '#4285F4', fontWeight: 700, cursor: 'pointer', padding: 0 }}>
                 Mark all as read
               </button>
             )}

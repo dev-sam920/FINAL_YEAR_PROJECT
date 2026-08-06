@@ -10,10 +10,26 @@ export default function TechnicianLayout({ children }) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { label: 'Dashboard', path: '/technician-dashboard' },
-    { label: 'My Assignments', path: '/my-assignments' },
-    { label: 'Profile', path: '/technician-profile' },
+  const navSections = [
+    {
+      title: 'General',
+      items: [
+        { label: 'Dashboard', path: '/technician-dashboard' },
+        { label: 'My Assignments', path: '/my-assignments' },
+      ],
+    },
+    {
+      title: 'Payments',
+      items: [
+        { label: 'Withdraw', path: '/technician/withdraw' },
+      ],
+    },
+    {
+      title: 'Account',
+      items: [
+        { label: 'Profile', path: '/technician-profile' },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -23,7 +39,7 @@ export default function TechnicianLayout({ children }) {
   const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <div className="admin-wrapper">
+    <div className="admin-wrapper technician-layout">
       <div className="admin-topbar">
         <div className="admin-topbar-title">SmartMaint</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -37,17 +53,28 @@ export default function TechnicianLayout({ children }) {
       {mobileMenuOpen && <div className="admin-mobile-backdrop" onClick={closeMenu} />}
 
       <aside className={`admin-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div style={{ fontWeight: 800, color: '#111111', fontSize: 22, marginBottom: 24 }}>SmartMaint</div>
+        <div className="admin-sidebar-brand">
+          <div className="admin-brand-mark">SM</div>
+          <div>
+            <div className="admin-brand-title">SmartMaint</div>
+            <div className="admin-brand-subtitle">Technician portal</div>
+          </div>
+        </div>
         <nav className="admin-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={`admin-nav-link ${location.pathname === item.path ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
-              {item.label}
-            </NavLink>
+          {navSections.map((section) => (
+            <div key={section.title} className="admin-nav-section">
+              <div className="admin-nav-section-title">{section.title}</div>
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={`admin-nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
 
@@ -59,9 +86,9 @@ export default function TechnicianLayout({ children }) {
               logout();
             }}
             style={{
-              border: '1px solid #E5E7EB',
-              background: '#FFFFFF',
-              color: '#111111',
+              border: '1px solid rgba(255,255,255,0.16)',
+              background: 'rgba(255,255,255,0.08)',
+              color: '#ffffff',
               padding: '0.7rem 0.9rem',
               borderRadius: 9999,
               cursor: 'pointer',
@@ -71,7 +98,7 @@ export default function TechnicianLayout({ children }) {
             Logout
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 9999, background: '#F5F5F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: 9999, background: '#4285F4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
               {user?.profilePicture ? (
                 <img src={user.profilePicture} alt={user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 9999 }} />
               ) : (
@@ -79,8 +106,8 @@ export default function TechnicianLayout({ children }) {
               )}
             </div>
             <div>
-              <div style={{ fontWeight: 700 }}>{user?.fullName || 'Technician'}</div>
-              <div style={{ fontSize: 12, color: '#6B7280' }}>{user?.email}</div>
+              <div style={{ fontWeight: 700, color: '#ffffff' }}>{user?.fullName || 'Technician'}</div>
+              <div style={{ fontSize: 12, color: '#9fb0d8' }}>{user?.email}</div>
             </div>
           </div>
         </div>

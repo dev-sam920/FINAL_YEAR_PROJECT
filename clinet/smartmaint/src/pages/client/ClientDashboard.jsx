@@ -1,11 +1,11 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { getMyRequests } from '../api/requests';
+import { getMyRequests } from '../../api/requests';
 import './ClientDashboard.css';
 
 export default function ClientDashboard() {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
@@ -89,7 +89,7 @@ export default function ClientDashboard() {
     all: requests.length,
     pending: requests.filter(r => r.status === 'Pending').length,
     'in-progress': requests.filter(r => r.status === 'In Progress').length,
-    completed: requests.filter(r => r.status === 'Completed').length
+    completed: requests.filter(r => r.status === 'Completed').length,
   };
 
   // Pagination
@@ -173,19 +173,7 @@ export default function ClientDashboard() {
                   Edit Profile
                 </button>
                 <button className="dropdown-item">Change Password</button>
-                <button
-                  className="dropdown-item logout-item"
-                  onClick={() => {
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userName');
-                    localStorage.removeItem('userRole');
-                    navigate('/login');
-                    setDropdownOpen(false);
-                  }}
-                >
-                  Logout
-                </button>
+                {/* Logout removed from dashboard dropdown (non-functional) */}
               </div>
             )}
           </div>

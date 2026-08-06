@@ -168,11 +168,8 @@ export default function Profile() {
 
     try {
       const data = await uploadProfilePicture(file);
-      setUser((prev) => ({
-        ...(prev || {}),
-        ...data.user,
-        role: data.user?.role ?? prev?.role,
-      }));
+      // Update auth context with fresh user object from server
+      setUser(data.user);
       setProfile((prev) => ({ ...prev, ...data.user }));
       setProfileMessage('Profile picture updated successfully');
     } catch (error) {
@@ -201,11 +198,8 @@ export default function Profile() {
       });
 
       setProfileMessage(data.message || 'Profile updated successfully');
-      setUser((prev) => ({
-        ...(prev || {}),
-        ...data.user,
-        role: data.user?.role ?? prev?.role,
-      }));
+      // Update auth context with fresh user object from server
+      setUser(data.user);
     } catch (error) {
       setProfileError(error.message || 'Failed to update profile');
     } finally {

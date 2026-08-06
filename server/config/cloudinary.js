@@ -44,7 +44,7 @@ const buildFileName = (file) => {
 export const createUploadMiddleware = ({
   fieldNameToFolder,
   allowedMimeTypes,
-  fileSize = 5 * 1024 * 1024,
+  fileSize = 4 * 1024 * 1024,
   errorMessage = 'Unsupported file type',
 }) => {
   const storage = cloudinaryConfigured && cloudinary && CloudinaryStorage

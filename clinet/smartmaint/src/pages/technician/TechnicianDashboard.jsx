@@ -5,13 +5,13 @@ import StatusTimeline from '../../components/StatusTimeline';
 import { AuthContext } from '../../context/AuthContext';
 
 const priorityBadgeStyles = {
-  Low: { background: '#ECFCCB', color: '#166534' },
-  Medium: { background: '#FDE68A', color: '#92400E' },
-  High: { background: '#FED7D7', color: '#991B1B' },
+  Low: { background: '#E8F1FF', color: '#2563EB' },
+  Medium: { background: '#E8F1FF', color: '#2563EB' },
+  High: { background: '#E8F1FF', color: '#2563EB' },
 };
 
 const statusBadgeStyles = {
-  submitted: { background: '#0B2818', color: '#FFFFFF' },
+  submitted: { background: '#0F1642', color: '#FFFFFF' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -68,7 +68,10 @@ export default function TechnicianDashboard() {
 
     const load = async () => {
       try {
-        const [statsResponse, requestsResponse] = await Promise.all([getTechnicianStats(), getMyAssignments({ status: '' })]);
+        const [statsResponse, requestsResponse] = await Promise.all([
+          getTechnicianStats(),
+          getMyAssignments({ status: '' }),
+        ]);
         setStats(statsResponse || {});
         setRequests(Array.isArray(requestsResponse.requests) ? requestsResponse.requests : []);
       } catch (err) {
@@ -79,12 +82,19 @@ export default function TechnicianDashboard() {
   }, [authLoading, user]);
 
   const previewRequests = useMemo(() => requests.slice(0, 5), [requests]);
+  const statCards = [
+    { label: 'Active Jobs', value: stats.totalAssigned || 0, icon: '🛠️', color: '#4285F4' },
+    { label: 'Acknowledged', value: stats.acknowledgedCount || 0, icon: '📝', color: '#34A853' },
+    { label: 'In Progress', value: stats.inProgressCount || 0, icon: '⚙️', color: '#F59E0B' },
+    { label: 'Completed', value: stats.completedCount || 0, icon: '✅', color: '#4285F4' },
+    { label: 'Rating', value: formatRating(stats.averageRating), icon: '⭐', color: '#0F1642' },
+  ];
 
   const openDetails = (request) => { setSelectedRequest(request); setIsModalOpen(true); };
   const closeDetails = () => { setSelectedRequest(null); setIsModalOpen(false); };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#FFFFFF', color: '#111111', padding: '2rem' }}>
+    <main style={{ minHeight: '100vh', background: '#F4F7FB', color: '#111111', padding: '2rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <section>
           <p style={{ margin: 0, color: '#6B7280', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Technician Dashboard</p>
@@ -93,16 +103,15 @@ export default function TechnicianDashboard() {
         </section>
 
         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-          {[
-            { label: 'Total Assigned', value: stats.totalAssigned || 0 },
-            { label: 'Acknowledged', value: stats.acknowledgedCount || 0 },
-            { label: 'In Progress', value: stats.inProgressCount || 0 },
-            { label: 'Completed', value: stats.completedCount || 0 },
-            { label: 'Average Rating', value: formatRating(stats.averageRating) },
-          ].map((card) => (
-            <div key={card.label} style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 10px 24px rgba(17,17,17,0.06)' }}>
-              <p style={{ margin: 0, color: '#6B7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{card.label}</p>
-              <p style={{ margin: '0.8rem 0 0', fontSize: '2rem', fontWeight: 700 }}>{card.value}</p>
+          {statCards.map((card) => (
+            <div key={card.label} style={{ background: '#FFFFFF', borderRadius: 20, border: '1px solid #E5E7EB', padding: '1.2rem', boxShadow: '0 10px 24px rgba(17,17,17,0.06)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `${card.color}22`, color: card.color, fontSize: 22 }}>
+                {card.icon}
+              </div>
+              <div>
+                <p style={{ margin: 0, color: '#6B7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{card.label}</p>
+                <p style={{ margin: '0.55rem 0 0', fontSize: '1.4rem', fontWeight: 700 }}>{card.value}</p>
+              </div>
             </div>
           ))}
         </section>
@@ -115,7 +124,7 @@ export default function TechnicianDashboard() {
             </div>
           </div>
           <div style={{ marginTop: '1rem' }}>
-            {previewRequests.length === 0 ? <div style={{ padding: '1.5rem', borderRadius: 20, background: '#F8FAFC', color: '#111111', textAlign: 'center' }}>No assignments yet.</div> : previewRequests.map((request) => <AssignmentCard key={request._id} request={request} onOpen={openDetails} />)}
+            {previewRequests.length === 0 ? <div style={{ padding: '1.5rem', borderRadius: 20, background: '#FFFFFF', border: '1px solid #E5E7EB', color: '#111111', textAlign: 'center' }}>No assignments yet.</div> : previewRequests.map((request) => <AssignmentCard key={request._id} request={request} onOpen={openDetails} />)}
           </div>
         </section>
       </div>

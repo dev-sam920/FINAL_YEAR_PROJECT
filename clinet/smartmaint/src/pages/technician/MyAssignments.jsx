@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { getMyAssignments, updateRequestStatus } from '../../api/technician';
 import TechnicianRequestDetailsModal from '../../components/TechnicianRequestDetailsModal';
 import { AuthContext } from '../../context/AuthContext';
@@ -6,13 +6,13 @@ import { AuthContext } from '../../context/AuthContext';
 const statusTabs = ['All', 'Acknowledged', 'In Progress', 'Completed'];
 
 const priorityBadgeStyles = {
-  Low: { background: '#ECFCCB', color: '#166534' },
-  Medium: { background: '#FDE68A', color: '#92400E' },
-  High: { background: '#FED7D7', color: '#991B1B' },
+  Low: { background: '#E8F1FF', color: '#2563EB' },
+  Medium: { background: '#E8F1FF', color: '#2563EB' },
+  High: { background: '#E8F1FF', color: '#2563EB' },
 };
 
 const statusBadgeStyles = {
-  submitted: { background: '#0B2818', color: '#FFFFFF' },
+  submitted: { background: '#0F1642', color: '#FFFFFF' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -56,6 +56,22 @@ export default function MyAssignments() {
     if (!user) return;
 
     loadRequests();
+  }, [authLoading, user]);
+
+  // Poll for updates so assignments refresh automatically for the technician
+  const pollingRef = useRef(null);
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) return;
+
+    // Start polling every 10 seconds
+    pollingRef.current = setInterval(() => {
+      loadRequests();
+    }, 10000);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, [authLoading, user]);
 
   const filtered = useMemo(() => requests.filter((request) => {
@@ -113,7 +129,7 @@ export default function MyAssignments() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#FFFFFF', color: '#111111', padding: '2rem' }}>
+    <main style={{ minHeight: '100vh', background: '#F4F7FB', color: '#111111', padding: '2rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <section>
           <h1 style={{ margin: 0, fontSize: '2rem' }}>My Assignments</h1>
@@ -122,14 +138,14 @@ export default function MyAssignments() {
 
         <section style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {statusTabs.map((tab) => (
-            <button key={tab} type="button" onClick={() => setActiveTab(tab)} style={{ padding: '0.55rem 0.85rem', borderRadius: 9999, border: activeTab === tab ? '1px solid #0B2818' : '1px solid #E5E7EB', background: activeTab === tab ? '#ECFDF3' : '#FFFFFF', cursor: 'pointer', fontWeight: 700 }}>
+            <button key={tab} type="button" onClick={() => setActiveTab(tab)} style={{ padding: '0.55rem 0.85rem', borderRadius: 9999, border: activeTab === tab ? '1px solid #4285F4' : '1px solid #E5E7EB', background: activeTab === tab ? '#E8F1FF' : '#FFFFFF', cursor: 'pointer', fontWeight: 700, color: activeTab === tab ? '#2563EB' : '#111111' }}>
               {tab}
             </button>
           ))}
         </section>
 
-        {errorMessage && <div style={{ padding: '0.8rem 1rem', borderRadius: 12, background: '#FEF2F2', color: '#991B1B' }}>{errorMessage}</div>}
-        {successMessage && <div style={{ padding: '0.8rem 1rem', borderRadius: 12, background: '#ECFDF3', color: '#166534' }}>{successMessage}</div>}
+        {errorMessage && <div style={{ padding: '0.8rem 1rem', borderRadius: 12, background: '#E8F1FF', color: '#2563EB' }}>{errorMessage}</div>}
+        {successMessage && <div style={{ padding: '0.8rem 1rem', borderRadius: 12, background: '#E8F1FF', color: '#2563EB' }}>{successMessage}</div>}
 
         <section style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
           {filtered.map((request) => {
@@ -153,9 +169,9 @@ export default function MyAssignments() {
                     {status === 'completed' ? 'Work completed' : status === 'in-progress' ? 'Assigned for active work' : 'Awaiting technician action'}
                   </div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }} onClick={(event) => event.stopPropagation()}>
-                    {status === 'acknowledged' && <button type="button" onClick={() => handleStatusUpdate(request._id, 'in-progress')} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Start Work</button>}
-                    {status === 'in-progress' && <button type="button" onClick={() => setPendingRequestId(request._id)} style={{ border: 'none', background: '#F5A623', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Mark Complete</button>}
-                    {status === 'completed' && <span style={{ color: '#166534', fontWeight: 700 }}>Completed</span>}
+                    {status === 'acknowledged' && <button type="button" onClick={() => handleStatusUpdate(request._id, 'in-progress')} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Start Work</button>}
+                    {status === 'in-progress' && <button type="button" onClick={() => setPendingRequestId(request._id)} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Mark Complete</button>}
+                    {status === 'completed' && <span style={{ color: '#2563EB', fontWeight: 700 }}>Completed</span>}
                   </div>
                 </div>
 
@@ -167,7 +183,7 @@ export default function MyAssignments() {
                     <textarea value={note} onChange={(event) => setNote(event.target.value)} style={{ width: '100%', minHeight: 90, padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB' }} />
                     <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
                       <button type="button" onClick={() => { setPendingRequestId(null); setNote(''); setJobCost(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
-                      <button type="button" onClick={confirmCompletion} disabled={loading} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Finish Request</button>
+                      <button type="button" onClick={confirmCompletion} disabled={loading} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Finish Request</button>
                     </div>
                   </div>
                 )}

@@ -6,6 +6,8 @@
   background-color: var(--sm-surface);
   color: var(--sm-text);
   padding: 32px 32px 48px;
+  --sm-accent: #4285F4;
+  --sm-accent-strong: #2563EB;
 }
 
 .my-requests-container {
@@ -34,8 +36,8 @@
   align-items: center;
   padding: 10px 16px;
   border-radius: 9999px;
-  background-color: rgba(11, 40, 24, 0.12);
-  color: var(--sm-accent);
+  background-color: rgba(66, 133, 244, 0.12);
+  color: #4285F4;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -55,7 +57,7 @@
 
 .btn-submit-new:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(11, 40, 24, 0.16);
+  box-shadow: 0 14px 32px rgba(66, 133, 244, 0.16);
 }
 
 .page-title {
@@ -105,7 +107,28 @@
   background-color: var(--sm-accent);
   border-color: var(--sm-accent);
   color: #ffffff;
-  box-shadow: 0 18px 34px rgba(11, 40, 24, 0.16);
+  box-shadow: 0 18px 34px rgba(66, 133, 244, 0.16);
+}
+
+.btn-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  background-color: #F5F5F5;
+  color: #4B5563;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-filter:hover {
+  background-color: #ffffff;
+  border-color: #4285F4;
+  color: #4285F4;
 }
 
 .search-wrapper {
@@ -194,13 +217,13 @@
 }
 
 .request-badge.priority-low {
-  background-color: #D1FAE5;
-  color: #0B2818;
+  background-color: #E8F0FF;
+  color: #1D4ED8;
 }
 
 .request-badge.priority-medium {
-  background-color: #E4F7EE;
-  color: #0B2818;
+  background-color: #EFF6FF;
+  color: #2563EB;
 }
 
 .request-badge.priority-high {
@@ -209,22 +232,22 @@
 }
 
 .request-badge.status-submitted {
-  background-color: #F3F4F6;
-  color: #0B2818;
+  background-color: #E8F0FF;
+  color: #1D4ED8;
 }
 
 .request-badge.status-acknowledged {
-  background-color: #F3F4F6;
-  color: #4B5563;
+  background-color: #E8F0FF;
+  color: #2563EB;
 }
 
 .request-badge.status-in-progress {
-  background-color: #D1FAE5;
-  color: #0B2818;
+  background-color: #E8F0FF;
+  color: #2563EB;
 }
 
 .request-badge.status-completed {
-  background-color: #0B2818;
+  background-color: #4285F4;
   color: #ffffff;
 }
 
@@ -240,8 +263,8 @@
   gap: 16px;
   padding: 16px 18px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #F7F7F5 0%, #ECFCCB 100%);
-  border: 1px solid rgba(11, 40, 24, 0.1);
+  background: linear-gradient(135deg, #F7F7F5 0%, #E8F0FF 100%);
+  border: 1px solid rgba(66, 133, 244, 0.14);
 }
 
 .payment-inline-label {
@@ -257,7 +280,7 @@
   margin: 6px 0 0;
   font-size: 18px;
   font-weight: 800;
-  color: #0B2818;
+  color: #1D4ED8;
 }
 
 .payment-action-btn {
@@ -278,9 +301,9 @@
 }
 
 .payment-link-btn {
-  border: 1px solid rgba(11, 40, 24, 0.15);
+  border: 1px solid rgba(66, 133, 244, 0.15);
   background: #ffffff;
-  color: #0B2818;
+  color: #4285F4;
   border-radius: 9999px;
   padding: 8px 12px;
   cursor: pointer;
@@ -297,8 +320,8 @@
 }
 
 .payment-pill.paid {
-  background: #D1FAE5;
-  color: #065F46;
+  background: rgba(66, 133, 244, 0.12);
+  color: #1D4ED8;
 }
 
 .request-empty-state,

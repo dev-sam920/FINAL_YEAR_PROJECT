@@ -14,7 +14,7 @@ const getStepState = (currentStatus, stepIndex) => {
 };
 
 export default function StatusTimeline({ currentStatus }) {
-  const accentColor = '#0B2818';
+  const accentColor = '#4285F4';
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center' }}>

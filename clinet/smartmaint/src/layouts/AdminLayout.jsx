@@ -25,6 +25,29 @@ export default function AdminLayout({ children }) {
 
   const closeMenu = () => setMobileMenuOpen(false);
 
+  const navSections = [
+    {
+      title: 'General',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', path: '/admin-dashboard' },
+      ],
+    },
+    {
+      title: 'Operations',
+      items: [
+        { id: 'requests', label: 'All Requests', path: '/admin/requests' },
+        { id: 'payments', label: 'Payments', path: '/admin/payments' },
+      ],
+    },
+    {
+      title: 'People',
+      items: [
+        { id: 'technicians', label: 'Technicians', path: '/admin/technicians' },
+        { id: 'clients', label: 'Clients', path: '/admin/clients' },
+      ],
+    },
+  ];
+
   return (
     <div className="admin-wrapper">
       <div className="admin-topbar">
@@ -49,11 +72,21 @@ export default function AdminLayout({ children }) {
         </div>
 
         <nav className="admin-nav">
-          <NavLink className={`admin-nav-link ${active === 'dashboard' ? 'active' : ''}`} to="/admin-dashboard" onClick={closeMenu}>Dashboard</NavLink>
-          <NavLink className={`admin-nav-link ${active === 'requests' ? 'active' : ''}`} to="/admin/requests" onClick={closeMenu}>All Requests</NavLink>
-          <NavLink className={`admin-nav-link ${active === 'payments' ? 'active' : ''}`} to="/admin/payments" onClick={closeMenu}>Payments</NavLink>
-          <NavLink className={`admin-nav-link ${active === 'technicians' ? 'active' : ''}`} to="/admin/technicians" onClick={closeMenu}>Technicians</NavLink>
-          <NavLink className={`admin-nav-link ${active === 'clients' ? 'active' : ''}`} to="/admin/clients" onClick={closeMenu}>Clients</NavLink>
+          {navSections.map((section) => (
+            <div key={section.title} className="admin-nav-section">
+              <div className="admin-nav-section-title">{section.title}</div>
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  className={`admin-nav-link ${active === item.id ? 'active' : ''}`}
+                  to={item.path}
+                  onClick={closeMenu}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          ))}
         </nav>
 
         <div className="admin-sidebar-user">

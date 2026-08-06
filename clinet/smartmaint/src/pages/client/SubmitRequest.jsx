@@ -4,7 +4,21 @@ import axiosInstance from '../../utils/axiosInstance.js';
 import { AuthContext } from '../../context/AuthContext';
 import './SubmitRequest.css';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FILE_SIZE = 4 * 1024 * 1024;
+const CATEGORY_OPTIONS = [
+  'Plumbing',
+  'Electrical',
+  'HVAC / Air Conditioning',
+  'Appliances',
+  'Structural / Building',
+  'Pest Control',
+  'Cleaning',
+  'Security',
+  'Landscaping / Outdoor',
+  'Painting',
+  'Carpentry',
+  'Other',
+];
 
 export default function SubmitRequest() {
   const { user } = useContext(AuthContext);
@@ -13,6 +27,7 @@ export default function SubmitRequest() {
   const [formData, setFormData] = useState({
     title: '',
     category: 'Plumbing',
+    customCategory: '',
     priority: 'Medium',
     description: '',
     location: '',
@@ -26,18 +41,41 @@ export default function SubmitRequest() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'category' && value !== 'Other' ? { customCategory: '' } : {}),
+    }));
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    console.debug('SubmitRequest: handleTitleChange ->', value);
+    setFormData((prev) => ({ ...prev, title: value }));
+    if (errors.title) {
+      setErrors((prev) => ({ ...prev, title: '' }));
+    }
+  };
+
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    console.debug('SubmitRequest: handleCategoryChange ->', value);
+    setFormData((prev) => ({
+      ...prev,
+      category: value,
+      ...(value !== 'Other' ? { customCategory: '' } : {}),
+    }));
+  };
+
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       if (file.size > MAX_FILE_SIZE) {
-        setErrorMessage('Photo must be smaller than 10MB.');
+        setErrorMessage('Image must be under 4MB.');
         return;
       }
 
@@ -60,7 +98,7 @@ export default function SubmitRequest() {
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
       if (file.size > MAX_FILE_SIZE) {
-        setErrorMessage('Photo must be smaller than 10MB.');
+        setErrorMessage('Image must be under 4MB.');
         return;
       }
       setPhotoFile(file);
@@ -79,8 +117,15 @@ export default function SubmitRequest() {
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
     }
+    if (formData.category === 'Other' && !formData.customCategory.trim()) {
+      newErrors.customCategory = 'Please specify the category';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleBack = () => {
+    navigate('/client-dashboard');
   };
 
   const handleSubmit = async (e) => {
@@ -92,17 +137,22 @@ export default function SubmitRequest() {
     setErrorMessage('');
 
     try {
-      await axiosInstance.post('/requests', {
-        title: formData.title,
-        category: formData.category,
-        priority: formData.priority,
-        description: formData.description,
-        location: formData.location,
-        photos: photoPreview ? [photoPreview] : [],
+      const payload = new FormData();
+      payload.append('title', formData.title.trim());
+      payload.append('category', formData.category === 'Other' ? formData.customCategory.trim() : formData.category);
+      payload.append('priority', formData.priority);
+      payload.append('description', formData.description.trim());
+      payload.append('location', formData.location.trim());
+      if (photoFile) {
+        payload.append('photo', photoFile);
+      }
+
+      await axiosInstance.post('/requests', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       setSuccessMessage('Request submitted successfully!');
-      setFormData({ title: '', category: 'Plumbing', priority: 'Medium', description: '', location: '' });
+      setFormData({ title: '', category: 'Plumbing', customCategory: '', priority: 'Medium', description: '', location: '' });
       setPhotoPreview(null);
       setPhotoFile(null);
       setErrors({});
@@ -139,7 +189,7 @@ export default function SubmitRequest() {
     <>
       <header className="top-navbar">
           <div className="page-branding">
-            <div className="page-badge">Client</div>
+            <div className="page-badge">Welcome To SM</div>
             <div className="page-tag">Submit new maintenance request</div>
           </div>
 
@@ -161,7 +211,7 @@ export default function SubmitRequest() {
               Tell us what needs fixing and we’ll route your request to the right team.
             </p>
           </div>
-          <button className="btn-submit-new" type="button" onClick={() => navigate('/client-dashboard')}>
+          <button className="btn-submit-new" type="button" onClick={handleBack} style={{ pointerEvents: 'auto' }}>
             Back to Dashboard
           </button>
         </div>
@@ -175,33 +225,54 @@ export default function SubmitRequest() {
               <div className="form-group">
                 <label htmlFor="title" className="form-label">Issue Title *</label>
                 <input
+                  key="issue-title-input"
                   id="title"
                   name="title"
                   type="text"
                   value={formData.title}
-                  onChange={handleInputChange}
+                  onChange={handleTitleChange}
+                  autoComplete="off"
                   className={`form-input ${errors.title ? 'error' : ''}`}
                   placeholder="e.g. Kitchen sink leaking"
+                  style={{ pointerEvents: 'auto', WebkitAppearance: 'textfield', MozAppearance: 'textfield', appearance: 'textfield' }}
                 />
                 {errors.title && <div className="error-text">{errors.title}</div>}
               </div>
 
               <div className="form-group">
                 <label htmlFor="category" className="form-label">Category</label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="form-input"
-                >
-                  <option value="Plumbing">Plumbing</option>
-                  <option value="Electrical">Electrical</option>
-                  <option value="HVAC">HVAC</option>
-                  <option value="Structural">Structural</option>
-                  <option value="Appliance">Appliance</option>
-                  <option value="Other">Other</option>
-                </select>
+                <div className="form-select-wrapper">
+                  <select
+                    key="category-select"
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleCategoryChange}
+                    className="form-input"
+                    aria-label="Request category"
+                    style={{ pointerEvents: 'auto', WebkitAppearance: 'menulist-button', MozAppearance: 'menulist-button', appearance: 'menulist-button' }}
+                  >
+                    {CATEGORY_OPTIONS.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {formData.category === 'Other' && (
+                  <div className="form-group" style={{ gap: 10 }}>
+                    <label htmlFor="customCategory" className="form-label">Please specify category *</label>
+                    <input
+                      id="customCategory"
+                      name="customCategory"
+                      type="text"
+                      value={formData.customCategory}
+                      onChange={handleInputChange}
+                      className={`form-input ${errors.customCategory ? 'error' : ''}`}
+                      placeholder="e.g. Pool maintenance"
+                    />
+                    {errors.customCategory && <div className="error-text">{errors.customCategory}</div>}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -276,7 +347,7 @@ export default function SubmitRequest() {
                   <div className="upload-placeholder">
                     <span className="upload-icon">📷</span>
                     <p className="upload-text">Click to upload or drag and drop</p>
-                    <p className="upload-hint">PNG, JPG, GIF up to 10MB</p>
+                    <p className="upload-hint">PNG, JPG, GIF up to 4MB</p>
                   </div>
                 )}
                 <input

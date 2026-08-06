@@ -47,7 +47,7 @@ export default function ForcePasswordChangeModal({ user, onUpdated, open = true 
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(17,17,17,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', zIndex: 2000 }}>
       <div style={{ width: '100%', maxWidth: 480, background: '#FFFFFF', borderRadius: 24, boxShadow: '0 24px 60px rgba(17,17,17,0.25)', padding: '1.35rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <p style={{ margin: 0, color: '#F5A623', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Security notice</p>
+          <p style={{ margin: 0, color: '#4285F4', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Security notice</p>
           <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#111111' }}>Change your password</h2>
           <p style={{ margin: 0, color: '#6B7280', lineHeight: 1.5 }}>This is your first login, so you need to set a new password before continuing.</p>
         </div>
@@ -72,7 +72,7 @@ export default function ForcePasswordChangeModal({ user, onUpdated, open = true 
             <input type="password" value={formData.confirmPassword} onChange={(event) => setFormData({ ...formData, confirmPassword: event.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB' }} />
           </div>
 
-          <button type="submit" disabled={loading} style={{ border: 'none', background: '#F5A623', color: '#111111', padding: '0.8rem 1rem', borderRadius: 9999, fontWeight: 700, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>
+          <button type="submit" disabled={loading} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.8rem 1rem', borderRadius: 9999, fontWeight: 700, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>
             {loading ? 'Updating password...' : 'Save new password'}
           </button>
         </form>

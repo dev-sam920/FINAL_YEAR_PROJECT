@@ -51,6 +51,12 @@ const buildUserResponse = (user, req) => {
     return asset;
   };
 
+  const addressValue = user.unitAddress || user.address || '';
+  const profileCompletionStatus = Boolean(
+    user.profileCompleted ||
+    (user.fullName && user.phone && addressValue && user.state && user.lga)
+  );
+
   return {
     id: user._id,
     fullName: user.fullName,
@@ -62,7 +68,8 @@ const buildUserResponse = (user, req) => {
     state: user.state || '',
     lga: user.lga || '',
     specialty: user.specialty || 'General',
-    profileCompleted: user.profileCompleted ?? false,
+    profileCompleted: profileCompletionStatus,
+    isProfileComplete: profileCompletionStatus,
     idDocument: normalizeAssetUrl(user.idDocument),
     yearsOfExperience: user.yearsOfExperience ?? null,
     bio: user.bio || '',

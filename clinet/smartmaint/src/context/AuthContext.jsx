@@ -53,6 +53,13 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+  };
+
   const logout = async () => {
     setLoading(true);
 
@@ -61,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout failed:', error.message || error);
     } finally {
+      clearLocalStorage();
       setUser(null);
       setLoading(false);
       navigate('/login');

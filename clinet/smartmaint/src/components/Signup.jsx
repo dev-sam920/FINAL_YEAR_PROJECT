@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import NaijaStates from 'naija-state-local-government';
 import { useNavigate } from 'react-router-dom';
 import { googleAuth, signupUser, technicianSignupUser } from '../api/auth';
 import heroImage from '../assets/hero.png';
 import { auth, googleProvider } from './firebase';
+import { AuthContext } from '../context/AuthContext';
 import './css/Signup.css';
 
 const specialtyOptions = ['Plumbing', 'Electrical', 'HVAC', 'Structural', 'Appliance', 'General'];
@@ -66,6 +67,7 @@ const getLgaOptions = (selectedState) => {
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
 
  
   const [formData, setFormData] = useState({
@@ -309,7 +311,16 @@ export default function Signup() {
       const response = await googleAuth(idToken);
 
       if (response?.user) {
-        navigate('/client-dashboard');
+        setUser(response.user);
+        if (response.user.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (response.user.role === 'technician') {
+          navigate('/technician-dashboard');
+        } else if (!response.user.profileCompleted) {
+          navigate('/client/complete-profile');
+        } else {
+          navigate('/client-dashboard');
+        }
       } else {
         setError('Google sign-in failed. Please try again.');
       }
@@ -542,7 +553,7 @@ export default function Signup() {
                   {profilePicturePreview && (
                     <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
                       <img src={profilePicturePreview} alt="Profile preview" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '1px solid #E5E7EB' }} />
-                      <span style={{ color: '#0B2818', fontWeight: 700 }}>Preview ready</span>
+                      <span style={{ color: '#4285F4', fontWeight: 700 }}>Preview ready</span>
                     </div>
                   )}
                 </div>
@@ -557,7 +568,7 @@ export default function Signup() {
                     onChange={(event) => handleFileChange(event, 'idDocument')}
                     disabled={loading}
                   />
-                  {idDocumentName && <div style={{ marginTop: 8, color: '#0B2818', fontWeight: 700 }}>Selected: {idDocumentName}</div>}
+                  {idDocumentName && <div style={{ marginTop: 8, color: '#4285F4', fontWeight: 700 }}>Selected: {idDocumentName}</div>}
                 </div>
               </>
             )}

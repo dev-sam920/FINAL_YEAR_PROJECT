@@ -57,7 +57,7 @@ export default function Technicians() {
       <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: '1.2rem 1.3rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div>
-            <p style={{ margin: 0, color: '#0B2818', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Talent & onboarding</p>
+            <p style={{ margin: 0, color: '#4285F4', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>Talent & onboarding</p>
             <h1 style={{ margin: '0.25rem 0 0', fontSize: '1.55rem', color: '#111111' }}>Technicians</h1>
             <p style={{ margin: '0.25rem 0 0', color: '#6B7280' }}>Invite new technicians and review incoming applications with clarity.</p>
           </div>
@@ -70,7 +70,7 @@ export default function Technicians() {
             }}
             style={{
               border: 'none',
-              background: '#0B2818',
+              background: '#4285F4',
               color: '#FFFFFF',
               padding: '0.8rem 1.2rem',
               borderRadius: 9999,
@@ -102,13 +102,13 @@ export default function Technicians() {
               <div style={{ fontWeight: 700, color: '#111111' }}>Pending applications</div>
               <div style={{ fontSize: 13, color: '#6B7280' }}>New technician sign-ups waiting for review.</div>
             </div>
-            <span style={{ background: '#F7F7F5', color: '#0B2818', borderRadius: 9999, padding: '0.35rem 0.7rem', fontSize: 13, fontWeight: 700 }}>{pendingTechs.length}</span>
+            <span style={{ background: '#F7F7F5', color: '#4285F4', borderRadius: 9999, padding: '0.35rem 0.7rem', fontSize: 13, fontWeight: 700 }}>{pendingTechs.length}</span>
           </div>
           <div style={{ padding: '1rem 1.2rem', display: 'grid', gap: 12 }}>
             {pendingTechs.map((tech) => (
               <div key={tech._id} style={{ background: '#F7F7F5', borderRadius: 18, padding: '1rem', display: 'grid', gap: 12 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#0B2818', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                  <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#4285F4', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
                     {tech.profilePicture ? (
                       <img src={tech.profilePicture} alt={tech.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     ) : (
@@ -134,13 +134,13 @@ export default function Technicians() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                   <div>
                     {tech.idDocument ? (
-                      <a href={tech.idDocument} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#0B2818', borderRadius: 9999, padding: '0.55rem 0.85rem', fontWeight: 700, textDecoration: 'none' }}>View certificate/ID</a>
+                      <a href={tech.idDocument} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#4285F4', borderRadius: 9999, padding: '0.55rem 0.85rem', fontWeight: 700, textDecoration: 'none' }}>View certificate/ID</a>
                     ) : (
                       <span style={{ color: '#6B7280' }}>No document uploaded</span>
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="button" onClick={() => handleReview(tech._id, 'approve')} style={{ border: 'none', background: '#0B2818', color: '#FFFFFF', padding: '0.6rem 0.9rem', borderRadius: 9999, cursor: 'pointer', fontWeight: 700 }}>Approve</button>
+                    <button type="button" onClick={() => handleReview(tech._id, 'approve')} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.6rem 0.9rem', borderRadius: 9999, cursor: 'pointer', fontWeight: 700 }}>Approve</button>
                     <button type="button" onClick={() => handleReview(tech._id, 'decline')} style={{ border: '1px solid #D1D5DB', background: '#FFFFFF', color: '#6B7280', padding: '0.6rem 0.9rem', borderRadius: 9999, cursor: 'pointer', fontWeight: 700 }}>Decline</button>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export default function Technicians() {
                   <td style={{ padding: '0.95rem 1rem', color: '#111111', fontWeight: 700 }}>{formatRating(t.averageRating, t.totalRatedJobs)}</td>
                   <td style={{ padding: '0.95rem 1rem', color: '#4B5563' }}>
                     {t.idDocument ? (
-                      <a href={t.idDocument} target="_blank" rel="noreferrer" style={{ color: '#0B2818', fontWeight: 700 }}>View document</a>
+                      <a href={t.idDocument} target="_blank" rel="noreferrer" style={{ color: '#4285F4', fontWeight: 700 }}>View document</a>
                     ) : (
                       '—'
                     )}
