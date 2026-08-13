@@ -236,6 +236,11 @@
   color: #1D4ED8;
 }
 
+.request-badge.status-assigned {
+  background-color: #FEF3C7;
+  color: #B45309;
+}
+
 .request-badge.status-acknowledged {
   background-color: #E8F0FF;
   color: #2563EB;

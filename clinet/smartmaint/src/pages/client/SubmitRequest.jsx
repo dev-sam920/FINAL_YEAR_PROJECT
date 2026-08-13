@@ -2,6 +2,7 @@ import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance.js';
 import { AuthContext } from '../../context/AuthContext';
+import LocationAutocompleteInput from '../../components/LocationAutocompleteInput.jsx';
 import './SubmitRequest.css';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024;
@@ -31,6 +32,8 @@ export default function SubmitRequest() {
     priority: 'Medium',
     description: '',
     location: '',
+    latitude: null,
+    longitude: null,
   });
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
@@ -45,6 +48,7 @@ export default function SubmitRequest() {
       ...prev,
       [name]: value,
       ...(name === 'category' && value !== 'Other' ? { customCategory: '' } : {}),
+      ...(name === 'location' ? { latitude: null, longitude: null } : {}),
     }));
 
     if (errors[name]) {
@@ -143,6 +147,8 @@ export default function SubmitRequest() {
       payload.append('priority', formData.priority);
       payload.append('description', formData.description.trim());
       payload.append('location', formData.location.trim());
+      if (formData.latitude !== null) payload.append('latitude', formData.latitude);
+      if (formData.longitude !== null) payload.append('longitude', formData.longitude);
       if (photoFile) {
         payload.append('photo', photoFile);
       }
@@ -152,7 +158,7 @@ export default function SubmitRequest() {
       });
 
       setSuccessMessage('Request submitted successfully!');
-      setFormData({ title: '', category: 'Plumbing', customCategory: '', priority: 'Medium', description: '', location: '' });
+      setFormData({ title: '', category: 'Plumbing', customCategory: '', priority: 'Medium', description: '', location: '', latitude: null, longitude: null });
       setPhotoPreview(null);
       setPhotoFile(null);
       setErrors({});
@@ -306,18 +312,17 @@ export default function SubmitRequest() {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="location" className="form-label">Location / Area</label>
-                <input
-                  id="location"
-                  name="location"
-                  type="text"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="e.g. Living room, Unit 4B"
-                />
-              </div>
+              <LocationAutocompleteInput
+                value={formData.location}
+                onChange={handleInputChange}
+                onSelect={(coords) => {
+                  if (coords && coords.latitude && coords.longitude) {
+                    setFormData((prev) => ({ ...prev, latitude: coords.latitude, longitude: coords.longitude }));
+                  }
+                }}
+                placeholder="e.g. Living room, Unit 4B"
+                error={errors.location}
+              />
             </div>
 
             <div className="form-group">

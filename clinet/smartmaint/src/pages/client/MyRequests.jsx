@@ -9,6 +9,7 @@ import './MyRequests.css';
 
 const statusLabelMap = {
   submitted: 'Submitted',
+  assigned: 'Assigned',
   acknowledged: 'Acknowledged',
   'in-progress': 'In Progress',
   completed: 'Completed',
@@ -22,9 +23,10 @@ const RequestCard = ({ request, onOpenDetails, onPayNow }) => {
   const dateString = new Date(request.createdAt).toLocaleDateString();
   const prioritySlug = getPrioritySlug(request.priority);
   const statusSlug = getStatusSlug(request.status);
-  const isCompleted = statusSlug === 'completed';
+  const isPaymentStage = statusSlug === 'acknowledged' || statusSlug === 'completed';
   const hasCost = typeof request.totalAmount === 'number' && request.totalAmount > 0;
   const isPaid = request.paymentStatus === 'paid';
+  const canShowPaymentCard = isPaymentStage && hasCost;
 
   const handlePayClick = (event) => {
     event.stopPropagation();
@@ -59,19 +61,31 @@ const RequestCard = ({ request, onOpenDetails, onPayNow }) => {
         <StatusTimeline currentStatus={statusSlug} />
       </div>
 
-      {isCompleted && hasCost && (
+      {(request.assignedTechnician && ['assigned', 'acknowledged', 'in-progress', 'completed'].includes(statusSlug)) && (
+        <div style={{ marginTop: 12, padding: '0.75rem', borderTop: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Assigned Technician</div>
+            <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: 700, color: '#0F172A' }}>{request.assignedTechnician.fullName || 'Technician'}</span>
+              {request.assignedTechnician.phoneNumber && (
+                <a href={`tel:${request.assignedTechnician.phoneNumber}`} style={{ color: '#4285F4', marginTop: 4 }}>{request.assignedTechnician.phoneNumber}</a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {statusSlug === 'acknowledged' && !hasCost && (
+        <div className="payment-inline-note">
+          <p>Technician is preparing a quote. You will be able to pay once the price is set.</p>
+        </div>
+      )}
+
+      {canShowPaymentCard && (
         <div className="payment-inline-card">
           <div>
             <div>
-              <p className="payment-inline-label">Service Cost</p>
-              <p className="payment-inline-value">₦{Number(request.jobCost || 0).toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="payment-inline-label">Platform Fee</p>
-              <p className="payment-inline-value">₦{Number(request.platformFee || 0).toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="payment-inline-label">Total</p>
+              <p className="payment-inline-label">Quote</p>
               <p className="payment-inline-value">₦{Number(request.totalAmount || 0).toLocaleString()}</p>
             </div>
           </div>
@@ -185,7 +199,7 @@ export default function MyRequests() {
 
         <section className="requests-toolbar">
           <div className="status-filter">
-            {['All', 'Submitted', 'Acknowledged', 'In Progress', 'Completed'].map((status) => (
+            {['All', 'Submitted', 'Assigned', 'Acknowledged', 'In Progress', 'Completed'].map((status) => (
               <button
                 key={status}
                 type="button"

@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import RequestLocationMap from './RequestLocationMap.jsx';
 import StatusTimeline from './StatusTimeline';
 
 const priorityBadgeStyles = {
@@ -9,6 +10,7 @@ const priorityBadgeStyles = {
 
 const statusBadgeStyles = {
   submitted: { background: '#4285F4', color: '#FFFFFF' },
+  assigned: { background: '#FEF3C7', color: '#B45309' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -95,6 +97,9 @@ export default function TechnicianRequestDetailsModal({ request, onClose }) {
             <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Location / Area</p>
             <p style={{ margin: '0.35rem 0 0', fontWeight: 700 }}>{request.location || 'Not provided'}</p>
           </div>
+          {(request.latitude !== null && request.longitude !== null) && (
+            <RequestLocationMap latitude={request.latitude} longitude={request.longitude} address={request.location} />
+          )}
           <div>
             <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Photo</p>
             {photoUrl ? <img src={photoUrl} alt="Maintenance request" style={{ marginTop: '0.65rem', maxWidth: '100%', maxHeight: 260, borderRadius: 16, objectFit: 'cover', border: '1px solid #E5E7EB' }} /> : <p style={{ margin: '0.65rem 0 0', color: '#6B7280' }}>No photo attached</p>}

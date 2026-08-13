@@ -1,6 +1,6 @@
 import express from 'express';
 import { protect, authorize } from '../middleware/authMiddleware.js';
-import { getTechnicianStats, getTechnicianRequests, changeTechnicianPassword, updateTechnicianRequestStatus, completeTechnicianProfile, getTechnicianBankList, getTechnicianBalance, getTechnicianWithdrawals, submitTechnicianBankAccount, requestTechnicianWithdrawal, handlePaystackWebhook } from '../controllers/technicianController.js';
+import { getTechnicianStats, getTechnicianRequests, changeTechnicianPassword, updateTechnicianRequestStatus, acknowledgeTechnicianRequest, setTechnicianRequestPrice, completeTechnicianProfile, getTechnicianBankList, getTechnicianBalance, getTechnicianWithdrawals, submitTechnicianBankAccount, requestTechnicianWithdrawal, handlePaystackWebhook } from '../controllers/technicianController.js';
 import { createUploadMiddleware } from '../config/cloudinary.js';
 
 const router = express.Router();
@@ -28,5 +28,7 @@ router.post('/withdraw', requestTechnicianWithdrawal);
 router.patch('/change-password', changeTechnicianPassword);
 router.post('/complete-profile', upload.single('idDocument'), completeTechnicianProfile);
 router.patch('/requests/:id/status', updateTechnicianRequestStatus);
+router.patch('/requests/:id/set-price', setTechnicianRequestPrice);
+router.patch('/requests/:id/acknowledge', acknowledgeTechnicianRequest);
 
 export default router;

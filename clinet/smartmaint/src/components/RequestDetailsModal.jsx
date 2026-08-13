@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { initializePayment } from '../api/payments';
 import { setRequestEmojiFeedback } from '../api/requests';
+import RequestLocationMap from './RequestLocationMap.jsx';
 import StatusTimeline from './StatusTimeline';
 
 const priorityBadgeStyles = {
@@ -11,6 +12,7 @@ const priorityBadgeStyles = {
 
 const statusBadgeStyles = {
   submitted: { background: '#4285F4', color: '#FFFFFF' },
+  assigned: { background: '#FEF3C7', color: '#B45309' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -81,6 +83,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
 
   const dateSubmitted = request.createdAt ? new Date(request.createdAt).toLocaleString() : 'Not available';
   const status = request.status || 'submitted';
+  const isPaymentStage = status === 'acknowledged' || status === 'completed';
   const isCompleted = status === 'completed';
   const hasRating = typeof request.rating === 'number' && request.rating >= 1;
 
@@ -233,6 +236,22 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
             </p>
           </div>
 
+          {request.assignedTechnician && request.status && request.status !== 'submitted' && (
+            <div>
+              <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Assigned Technician</p>
+              <div style={{ marginTop: '0.35rem', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ fontSize: 15, fontWeight: 700 }}>{request.assignedTechnician.fullName || 'Technician'}</span>
+                {request.assignedTechnician.phoneNumber && (
+                  <a href={`tel:${request.assignedTechnician.phoneNumber}`} style={{ color: '#4285F4' }}>{request.assignedTechnician.phoneNumber}</a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {(request.latitude !== null && request.longitude !== null) && (
+            <RequestLocationMap latitude={request.latitude} longitude={request.longitude} address={request.location} />
+          )}
+
           <div>
             <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Photo</p>
             {photoUrl ? (
@@ -251,22 +270,17 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
             <p style={{ margin: '0.35rem 0 0', fontSize: 15, fontWeight: 600 }}>{dateSubmitted}</p>
           </div>
 
-          {isCompleted && (
+          {isPaymentStage && (
             <div>
               <p style={{ margin: 0, fontSize: 12, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Payment</p>
               {typeof request.totalAmount === 'number' && request.totalAmount > 0 ? (
                 <div style={{ marginTop: '0.65rem', display: 'grid', gap: 8 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                    <span style={{ color: '#6B7280' }}>Service Cost</span>
-                    <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.jobCost || 0).toLocaleString()}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                    <span style={{ color: '#6B7280' }}>Platform Fee (10%)</span>
-                    <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.platformFee || 0).toLocaleString()}</span>
-                  </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, borderTop: '1px solid #E5E7EB', paddingTop: 8 }}>
-                    <span style={{ color: '#111111', fontWeight: 700 }}>Total</span>
+                    <span style={{ color: '#111111', fontWeight: 700 }}>Total due</span>
                     <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
+                  </div>
+                  <div style={{ marginTop: 8, color: '#6B7280', fontSize: 13 }}>
+                    This is the exact amount you will be charged. Platform fees are deducted from the technician payout.
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
                     {request.paymentStatus === 'paid' ? (
@@ -286,7 +300,7 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                   </div>
                 </div>
               ) : (
-                <p style={{ margin: '0.65rem 0 0', color: '#6B7280' }}>No service fee has been set yet.</p>
+                <p style={{ margin: '0.65rem 0 0', color: '#6B7280' }}>Technician is still preparing your quote. Please check back once the price has been set.</p>
               )}
             </div>
           )}

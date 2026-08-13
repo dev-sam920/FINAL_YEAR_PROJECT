@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Request from '../models/Request.js';
 import User from '../models/User.js';
 import Withdrawal from '../models/Withdrawal.js';
@@ -449,26 +450,34 @@ export const updateTechnicianRequestStatus = async (req, res) => {
       return res.status(400).json({ message: 'Invalid status transition' });
     }
 
+    if (status === 'in-progress' && request.paymentStatus !== 'paid') {
+      return res.status(400).json({ message: 'Cannot start work until payment has been completed' });
+    }
+
     request.status = status;
     if (status === 'completed' && typeof note === 'string') {
       request.completionNote = note.trim();
     }
 
     if (status === 'completed') {
-      const parsedJobCost = Number(jobCost);
-      if (!Number.isFinite(parsedJobCost) || parsedJobCost <= 0) {
-        return res.status(400).json({ message: 'Please enter a valid job cost before completing the request' });
+      if (request.paymentStatus === 'paid' && typeof request.jobCost === 'number' && typeof request.totalAmount === 'number') {
+        // Preserve completed payment details when the request was already paid before work started.
+      } else {
+        const parsedJobCost = Number(jobCost);
+        if (!Number.isFinite(parsedJobCost) || parsedJobCost <= 0) {
+          return res.status(400).json({ message: 'Please enter a valid job cost before completing the request' });
+        }
+
+        const platformFee = Math.round(parsedJobCost * 0.10);
+        const totalAmount = parsedJobCost + platformFee;
+
+        request.jobCost = parsedJobCost;
+        request.platformFee = platformFee;
+        request.totalAmount = totalAmount;
+        request.paymentStatus = 'unpaid';
+        request.paymentReference = null;
+        request.paidAt = null;
       }
-
-      const platformFee = Math.round(parsedJobCost * 0.10);
-      const totalAmount = parsedJobCost + platformFee;
-
-      request.jobCost = parsedJobCost;
-      request.platformFee = platformFee;
-      request.totalAmount = totalAmount;
-      request.paymentStatus = 'unpaid';
-      request.paymentReference = null;
-      request.paidAt = null;
     }
 
     await request.save();
@@ -528,5 +537,97 @@ export const updateTechnicianRequestStatus = async (req, res) => {
     res.status(200).json({ message: 'Status updated', request: updatedRequest });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Failed to update request status' });
+  }
+};
+
+export const setTechnicianRequestPrice = async (req, res) => {
+  try {
+    const technicianId = req.user.id;
+    const { id } = req.params;
+    const { price } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid request identifier' });
+    }
+
+    const request = await Request.findById(id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    if (String(request.assignedTechnician) !== String(technicianId)) {
+      return res.status(403).json({ message: 'You are not assigned to this request' });
+    }
+    if (request.status !== 'acknowledged') {
+      return res.status(400).json({ message: 'Price can only be set for requests in Acknowledged status' });
+    }
+
+    const parsedPrice = Number(price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+      return res.status(400).json({ message: 'Please enter a valid job price' });
+    }
+
+    request.jobPrice = parsedPrice;
+    request.jobCost = parsedPrice;
+    request.platformFee = Math.round(parsedPrice * 0.10);
+    request.totalAmount = parsedPrice;
+    request.paymentStatus = 'unpaid';
+    request.paymentReference = null;
+    request.paidAt = null;
+    await request.save();
+
+    const populatedRequest = await Request.findById(id).populate('client', 'fullName email phone');
+    if (populatedRequest?.client) {
+      const clientId = typeof populatedRequest.client === 'string'
+        ? populatedRequest.client
+        : populatedRequest.client._id?.toString?.() || populatedRequest.client.toString();
+
+      await createNotification({
+        recipientId: clientId,
+        message: `A price quote of ₦${parsedPrice.toLocaleString()} is ready for your request '${populatedRequest.title || 'request'}'. Please pay now to continue.`,
+        type: 'payment',
+        relatedRequest: populatedRequest._id,
+      });
+    }
+
+    res.status(200).json({ message: 'Price set successfully', request: populatedRequest });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to set request price' });
+  }
+};
+
+export const acknowledgeTechnicianRequest = async (req, res) => {
+  try {
+    const technicianId = req.user.id;
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid request identifier' });
+    }
+
+    const request = await Request.findById(id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    if (String(request.assignedTechnician) !== String(technicianId)) {
+      return res.status(403).json({ message: 'You are not assigned to this request' });
+    }
+    if (request.status !== 'assigned') {
+      return res.status(400).json({ message: 'Request must be in Assigned status to acknowledge' });
+    }
+
+    request.status = 'acknowledged';
+    await request.save();
+
+    const populatedRequest = await Request.findById(id).populate('client', 'fullName email phone').populate('assignedTechnician', 'fullName');
+
+    if (populatedRequest?.client) {
+      const clientId = typeof populatedRequest.client === 'string' ? populatedRequest.client : populatedRequest.client._id?.toString?.() || populatedRequest.client.toString();
+      await createNotification({
+        recipientId: clientId,
+        message: `Your assigned request '${populatedRequest.title || 'request'}' has been acknowledged by the technician.`,
+        type: 'status_update',
+        relatedRequest: populatedRequest._id,
+      });
+    }
+
+    res.status(200).json({ message: 'Request acknowledged', request: populatedRequest });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to acknowledge request' });
   }
 };

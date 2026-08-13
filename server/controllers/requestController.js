@@ -11,11 +11,13 @@ const ALLOWED_EMOJI_FEEDBACK = ['angry', 'confused', 'neutral', 'happy', 'love']
  */
 export const createRequest = async (req, res) => {
   try {
-    const { title, category, priority, description, location, photos } = req.body;
+    const { title, category, priority, description, location, latitude, longitude, photos } = req.body;
     const normalizedTitle = (title || '').trim();
     const normalizedCategory = (category || '').trim();
     const normalizedDescription = (description || '').trim();
     const normalizedLocation = (location || '').trim();
+    const parsedLatitude = latitude !== undefined ? parseFloat(latitude) : null;
+    const parsedLongitude = longitude !== undefined ? parseFloat(longitude) : null;
     const photoUrl = req.file ? getUploadedAssetUrl(req.file) : null;
     const resolvedPhotos = photoUrl
       ? [photoUrl]
@@ -34,6 +36,8 @@ export const createRequest = async (req, res) => {
       priority: priority || 'Medium',
       description: normalizedDescription,
       location: normalizedLocation,
+      latitude: Number.isFinite(parsedLatitude) ? parsedLatitude : null,
+      longitude: Number.isFinite(parsedLongitude) ? parsedLongitude : null,
       photos: resolvedPhotos,
     });
 
@@ -70,6 +74,7 @@ export const getMyRequests = async (req, res) => {
   try {
     const requests = await Request.find({ client: req.user.id })
       .sort({ createdAt: -1 })
+      .populate('assignedTechnician', 'fullName phoneNumber')
       .lean();
 
     res.status(200).json({ requests });

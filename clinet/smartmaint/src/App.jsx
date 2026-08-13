@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
@@ -20,6 +20,7 @@ import SplashScreen from './components/SplashScreen.jsx';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AllRequests from './pages/admin/AllRequests';
+import SupportTicketsAdmin from './pages/admin/SupportTickets';
 import PaymentsAdmin from './pages/admin/Payments';
 import Technicians from './pages/admin/Technicians';
 import Clients from './pages/admin/Clients';
@@ -169,6 +170,16 @@ const App = () => {
             }
           />
           <Route
+            path="/admin/support-tickets"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminLayout>
+                  <SupportTicketsAdmin />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/payments"
             element={
               <ProtectedRoute roles={["admin"]}>
@@ -211,10 +222,29 @@ export default App;
 function SplashController() {
   const { showSplash } = useLoading();
   const [visible, setVisible] = useState(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
-    if (showSplash) setVisible(true);
-    else requestAnimationFrame(() => setVisible(false));
+    // When `showSplash` becomes true, show the splash and ensure it hides after 3s.
+    if (showSplash) {
+      setVisible(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        setVisible(false);
+        timerRef.current = null;
+      }, 3000);
+    } else {
+      // If navigation finished before the timeout, keep the timer to let
+      // the 3s minimum elapse. If no timer exists, hide immediately.
+      if (!timerRef.current) setVisible(false);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [showSplash]);
 
   if (!visible) return null;

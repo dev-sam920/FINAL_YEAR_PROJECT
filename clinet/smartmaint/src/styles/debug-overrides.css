@@ -8,7 +8,6 @@
 .login-overlay,
 .service-overlay,
 .portfolio-overlay,
-.sm-splash-root,
 .admin-mobile-backdrop {
   pointer-events: none !important;
   background: transparent !important;

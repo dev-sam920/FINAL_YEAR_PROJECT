@@ -27,13 +27,21 @@ export const initializePayment = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to pay for this request' });
     }
 
-    if (request.status !== 'completed') {
-      return res.status(400).json({ message: 'Only completed requests can be paid for' });
+    if (request.status !== 'acknowledged' && request.status !== 'completed') {
+      return res.status(400).json({ message: 'Only acknowledged or completed requests can be paid for' });
     }
 
-    const totalAmount = Number(request.totalAmount ?? request.jobCost ?? 0);
+    if (request.paymentStatus === 'paid') {
+      return res.status(400).json({ message: 'This request has already been paid' });
+    }
+
+    if (request.status === 'acknowledged' && (request.jobPrice == null || Number(request.jobPrice) <= 0)) {
+      return res.status(400).json({ message: 'Job price must be set before payment can be initiated' });
+    }
+
+    const totalAmount = Number(request.jobPrice ?? request.totalAmount ?? request.jobCost ?? 0);
     if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
-      return res.status(400).json({ message: 'This request does not have a valid service cost yet' });
+      return res.status(400).json({ message: 'This request must have a valid service amount before payment can be initiated' });
     }
 
     if (!process.env.PAYSTACK_SECRET_KEY) {

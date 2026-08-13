@@ -1,9 +1,9 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { getMyAssignments, updateRequestStatus } from '../../api/technician';
+import { getMyAssignments, updateRequestStatus, acknowledgeRequest, setRequestPrice } from '../../api/technician';
 import TechnicianRequestDetailsModal from '../../components/TechnicianRequestDetailsModal';
 import { AuthContext } from '../../context/AuthContext';
 
-const statusTabs = ['All', 'Acknowledged', 'In Progress', 'Completed'];
+const statusTabs = ['All', 'Assigned', 'Acknowledged', 'In Progress', 'Completed'];
 
 const priorityBadgeStyles = {
   Low: { background: '#E8F1FF', color: '#2563EB' },
@@ -13,6 +13,7 @@ const priorityBadgeStyles = {
 
 const statusBadgeStyles = {
   submitted: { background: '#0F1642', color: '#FFFFFF' },
+  assigned: { background: '#FEF3C7', color: '#B45309' },
   acknowledged: { background: '#E5E7EB', color: '#111111' },
   'in-progress': { background: '#E5E7EB', color: '#111111' },
   completed: { background: '#111111', color: '#FFFFFF' },
@@ -21,6 +22,7 @@ const statusBadgeStyles = {
 const getStatusLabel = (status) => {
   switch (status) {
     case 'submitted': return 'Submitted';
+    case 'assigned': return 'Assigned';
     case 'acknowledged': return 'Acknowledged';
     case 'in-progress': return 'In Progress';
     case 'completed': return 'Completed';
@@ -34,8 +36,9 @@ export default function MyAssignments() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingRequestId, setPendingRequestId] = useState(null);
+  const [priceRequestId, setPriceRequestId] = useState(null);
   const [note, setNote] = useState('');
-  const [jobCost, setJobCost] = useState('');
+  const [priceValue, setPriceValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -104,22 +107,53 @@ export default function MyAssignments() {
     }
   };
 
+  const handleAcknowledge = async (requestId) => {
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    try {
+      await acknowledgeRequest(requestId);
+      setSuccessMessage('Request acknowledged');
+      await loadRequests();
+    } catch (err) {
+      setErrorMessage(err.response?.data?.message || 'Failed to acknowledge request');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetPrice = async () => {
+    if (!priceValue || Number(priceValue) <= 0) {
+      setErrorMessage('Please enter a valid job cost');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    try {
+      await setRequestPrice(priceRequestId, Number(priceValue));
+      setSuccessMessage('Job price set successfully');
+      setPriceRequestId(null);
+      setPriceValue('');
+      await loadRequests();
+    } catch (err) {
+      setErrorMessage(err.response?.data?.message || 'Failed to set job price');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const confirmCompletion = async () => {
     if (!pendingRequestId) return;
     setLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
     try {
-      if (!jobCost || Number(jobCost) <= 0) {
-        setErrorMessage('Please enter a valid job cost before completing the request');
-        return;
-      }
-
-      await updateRequestStatus(pendingRequestId, 'completed', note, jobCost);
+      await updateRequestStatus(pendingRequestId, 'completed', note, '');
       setSuccessMessage('Request marked as completed');
       setPendingRequestId(null);
       setNote('');
-      setJobCost('');
       await loadRequests();
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Failed to complete request');
@@ -166,10 +200,26 @@ export default function MyAssignments() {
 
                 <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <div style={{ color: '#6B7280', fontSize: 13 }}>
-                    {status === 'completed' ? 'Work completed' : status === 'in-progress' ? 'Assigned for active work' : 'Awaiting technician action'}
+                    {status === 'completed'
+                      ? 'Work completed'
+                      : status === 'in-progress'
+                      ? 'Assigned for active work'
+                      : status === 'assigned'
+                      ? 'Please acknowledge this assignment'
+                      : status === 'acknowledged'
+                      ? 'Ready to begin work'
+                      : 'Awaiting technician action'}
                   </div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }} onClick={(event) => event.stopPropagation()}>
-                    {status === 'acknowledged' && <button type="button" onClick={() => handleStatusUpdate(request._id, 'in-progress')} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Start Work</button>}
+                    {status === 'assigned' && <button type="button" onClick={() => handleAcknowledge(request._id)} disabled={loading} style={{ border: 'none', background: '#10B981', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Acknowledge</button>}
+                    {status === 'acknowledged' && !request.jobPrice && (
+                      <button type="button" onClick={() => { setPriceRequestId(request._id); setPriceValue(''); }} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Set Price</button>
+                    )}
+                    {status === 'acknowledged' && request.jobPrice && (request.paymentStatus === 'paid' ? (
+                      <button type="button" onClick={() => handleStatusUpdate(request._id, 'in-progress')} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Start Work</button>
+                    ) : (
+                      <button type="button" disabled style={{ border: 'none', background: '#E5E7EB', color: '#6B7280', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'not-allowed' }}>Awaiting payment</button>
+                    ))}
                     {status === 'in-progress' && <button type="button" onClick={() => setPendingRequestId(request._id)} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Mark Complete</button>}
                     {status === 'completed' && <span style={{ color: '#2563EB', fontWeight: 700 }}>Completed</span>}
                   </div>
@@ -177,13 +227,22 @@ export default function MyAssignments() {
 
                 {pendingRequestId === request._id && (
                   <div style={{ marginTop: 12, padding: '0.9rem', borderRadius: 16, background: '#F9FAFB', border: '1px solid #E5E7EB' }} onClick={(event) => event.stopPropagation()}>
-                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 700 }}>Job Cost (₦)</label>
-                    <input type="number" min="0" value={jobCost} onChange={(event) => setJobCost(event.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB', marginBottom: 10 }} />
                     <label style={{ display: 'block', marginBottom: 6, fontWeight: 700 }}>Completion note (optional)</label>
                     <textarea value={note} onChange={(event) => setNote(event.target.value)} style={{ width: '100%', minHeight: 90, padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB' }} />
                     <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
-                      <button type="button" onClick={() => { setPendingRequestId(null); setNote(''); setJobCost(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
+                      <button type="button" onClick={() => { setPendingRequestId(null); setNote(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
                       <button type="button" onClick={confirmCompletion} disabled={loading} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Finish Request</button>
+                    </div>
+                  </div>
+                )}
+                {priceRequestId === request._id && (
+                  <div style={{ marginTop: 12, padding: '0.9rem', borderRadius: 16, background: '#F9FAFB', border: '1px solid #E5E7EB' }} onClick={(event) => event.stopPropagation()}>
+                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 700 }}>Enter job price (₦)</label>
+                    <input type="number" min="0" value={priceValue} onChange={(event) => setPriceValue(event.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: 10, border: '1px solid #E5E7EB', marginBottom: 10 }} />
+                    <p style={{ margin: 0, color: '#6B7280', fontSize: 13, lineHeight: 1.5 }}>Client will be charged this exact amount. You will receive 90% after platform fees.</p>
+                    <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
+                      <button type="button" onClick={() => { setPriceRequestId(null); setPriceValue(''); }} style={{ border: '1px solid #E5E7EB', background: '#FFFFFF', color: '#111111', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Cancel</button>
+                      <button type="button" onClick={handleSetPrice} disabled={loading} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Set Price</button>
                     </div>
                   </div>
                 )}

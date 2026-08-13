@@ -15,6 +15,7 @@ const normalizeStatusValue = (value) => {
 const getStatusLabel = (value) => {
   const normalized = normalizeStatusValue(value);
   if (normalized === 'submitted') return 'Submitted';
+  if (normalized === 'assigned') return 'Assigned';
   if (normalized === 'acknowledged') return 'Acknowledged';
   if (normalized === 'in-progress') return 'In Progress';
   if (normalized === 'completed') return 'Completed';
@@ -30,7 +31,9 @@ const getPriorityBadgeStyle = (priority) => {
 
 const getStatusBadgeStyle = (value) => {
   const normalized = normalizeStatusValue(value);
-  if (normalized === 'submitted' || normalized === 'acknowledged') return { background: '#DBEAFE', color: '#2563EB' };
+  if (normalized === 'submitted') return { background: '#DBEAFE', color: '#2563EB' };
+  if (normalized === 'assigned') return { background: '#FEF3C7', color: '#B45309' };
+  if (normalized === 'acknowledged') return { background: '#DBEAFE', color: '#2563EB' };
   if (normalized === 'in-progress') return { background: '#FEF3C7', color: '#D97706' };
   if (normalized === 'completed') return { background: '#D1FAE5', color: '#059669' };
   return { background: '#F3F4F6', color: '#6B7280' };
@@ -128,7 +131,7 @@ export default function AllRequests() {
 
       <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: '1rem 1.2rem' }}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          {['', 'submitted', 'in-progress', 'completed'].map((value) => (
+          {['', 'submitted', 'assigned', 'acknowledged', 'in-progress', 'completed'].map((value) => (
             <button
               key={value || 'all'}
               type="button"

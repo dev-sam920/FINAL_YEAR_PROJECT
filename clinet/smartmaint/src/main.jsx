@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import './styles/theme.css'
 import './index.css'
 // Debug overrides (temporary) to help unblock clickability issues during local testing
 import './styles/debug-overrides.css'

@@ -409,9 +409,10 @@ export const assignTechnician = async (req, res) => {
     const request = await Request.findById(id);
     if (!request) return res.status(404).json({ message: 'Request not found' });
 
-    const prevStatus = request.status;
     request.assignedTechnician = technicianId;
-    if (prevStatus === 'submitted') request.status = 'acknowledged';
+    if (request.status === 'submitted') {
+      request.status = 'assigned';
+    }
 
     await request.save();
 

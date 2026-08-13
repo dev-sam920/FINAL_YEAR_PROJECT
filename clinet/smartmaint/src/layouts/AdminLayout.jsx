@@ -7,6 +7,7 @@ import './admin.css';
 const pathToNav = {
   '/admin-dashboard': 'dashboard',
   '/admin/requests': 'requests',
+  '/admin/support-tickets': 'support',
   '/admin/payments': 'payments',
   '/admin/technicians': 'technicians',
   '/admin/clients': 'clients',
@@ -36,6 +37,7 @@ export default function AdminLayout({ children }) {
       title: 'Operations',
       items: [
         { id: 'requests', label: 'All Requests', path: '/admin/requests' },
+        { id: 'support', label: 'Support Tickets', path: '/admin/support-tickets' },
         { id: 'payments', label: 'Payments', path: '/admin/payments' },
       ],
     },

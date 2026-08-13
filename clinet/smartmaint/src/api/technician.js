@@ -16,6 +16,16 @@ export async function updateRequestStatus(requestId, status, note, jobCost) {
   return resp.data;
 }
 
+export async function setRequestPrice(requestId, price) {
+  const resp = await axiosInstance.patch(`/technician/requests/${requestId}/set-price`, { price });
+  return resp.data;
+}
+
+export async function acknowledgeRequest(requestId) {
+  const resp = await axiosInstance.patch(`/technician/requests/${requestId}/acknowledge`);
+  return resp.data;
+}
+
 export async function changeTechnicianPassword(currentPassword, newPassword) {
   const resp = await axiosInstance.patch('/technician/change-password', { currentPassword, newPassword });
   return resp.data;

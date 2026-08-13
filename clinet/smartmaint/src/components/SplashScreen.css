@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, var(--sm-navy) 0%, #101a4a 100%);
+  background: linear-gradient(180deg, var(--sm-navy, #0f1642) 0%, #101a4a 100%);
   color: #fff;
   z-index: 9999;
   transition: opacity 180ms ease;
@@ -24,7 +24,7 @@
   height: 72px;
   border-radius: 16px;
   background: #ffffff;
-  color: var(--sm-navy);
+  color: var(--sm-navy, #0f1642);
   display: flex;
   align-items: center;
   justify-content: center;

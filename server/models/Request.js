@@ -27,6 +27,14 @@ const requestSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    latitude: {
+      type: Number,
+      default: null,
+    },
+    longitude: {
+      type: Number,
+      default: null,
+    },
     priority: {
       type: String,
       enum: ['Low', 'Medium', 'High'],
@@ -34,7 +42,7 @@ const requestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['submitted', 'acknowledged', 'in-progress', 'completed'],
+      enum: ['submitted', 'assigned', 'acknowledged', 'in-progress', 'completed'],
       default: 'submitted',
     },
     photos: [String],
@@ -55,6 +63,10 @@ const requestSchema = new mongoose.Schema(
       default: '',
     },
     jobCost: {
+      type: Number,
+      default: null,
+    },
+    jobPrice: {
       type: Number,
       default: null,
     },

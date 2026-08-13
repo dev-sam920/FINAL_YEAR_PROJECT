@@ -304,7 +304,18 @@ export default function ClientDashboard() {
                       />
                     </td>
                     <td className="request-id">{request.requestId || request._id}</td>
-                    <td className="description">{request.title}</td>
+                    <td className="description">
+                      <div>{request.title}</div>
+                      {request.assignedTechnician && request.status && request.status.toLowerCase() !== 'submitted' && (
+                        <div style={{ marginTop: 6, fontSize: 13, borderTop: '1px solid transparent', paddingTop: 6 }}>
+                          <div style={{ fontSize: 12, color: '#6B7280' }}>Assigned Technician</div>
+                          <div style={{ fontWeight: 700, color: '#0F172A' }}>{request.assignedTechnician.fullName || 'Technician'}</div>
+                          {request.assignedTechnician.phoneNumber && (
+                            <a href={`tel:${request.assignedTechnician.phoneNumber}`} style={{ color: '#4285F4' }}>{request.assignedTechnician.phoneNumber}</a>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td className="category">{request.category}</td>
                     <td>
                       <span className={`badge badge-priority-${request.priority.toLowerCase()}`}>

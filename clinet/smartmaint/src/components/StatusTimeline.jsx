@@ -1,5 +1,6 @@
 const statusSteps = [
   { key: 'submitted', label: 'Submitted' },
+  { key: 'assigned', label: 'Assigned' },
   { key: 'acknowledged', label: 'Acknowledged' },
   { key: 'in-progress', label: 'In Progress' },
   { key: 'completed', label: 'Completed' },
