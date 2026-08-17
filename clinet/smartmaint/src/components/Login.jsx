@@ -3,6 +3,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { googleAuth, loginUser } from '../api/auth';
 import { AuthContext } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import heroImage from '../assets/hero.png';
 import { auth, googleProvider } from './firebase';
 import './css/Login.css';
@@ -11,6 +12,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { setUser } = useContext(AuthContext);
+  const { triggerSplash } = useLoading();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -52,6 +54,8 @@ export default function Login() {
 
       if (response?.user) {
         setUser(response.user);
+        // show splash once during transition after successful login
+        triggerSplash();
         if (response.user.role === 'admin') {
           navigate('/admin-dashboard');
         } else if (response.user.role === 'technician') {
@@ -95,7 +99,8 @@ export default function Login() {
 
       if (response?.user) {
         setUser(response.user);
-
+        // show splash once during transition after successful login
+        triggerSplash();
         if (response.user.role === 'admin') {
           navigate('/admin-dashboard');
         } else if (response.user.role === 'technician') {

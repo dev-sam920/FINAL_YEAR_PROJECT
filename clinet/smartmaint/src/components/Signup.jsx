@@ -6,6 +6,7 @@ import { googleAuth, signupUser, technicianSignupUser } from '../api/auth';
 import heroImage from '../assets/hero.png';
 import { auth, googleProvider } from './firebase';
 import { AuthContext } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import './css/Signup.css';
 
 const specialtyOptions = ['Plumbing', 'Electrical', 'HVAC', 'Structural', 'Appliance', 'General'];
@@ -68,6 +69,7 @@ const getLgaOptions = (selectedState) => {
 export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
+  const { triggerSplash } = useLoading();
 
  
   const [formData, setFormData] = useState({
@@ -312,6 +314,8 @@ export default function Signup() {
 
       if (response?.user) {
         setUser(response.user);
+        // show splash once during transition after successful signup via Google
+        triggerSplash();
         if (response.user.role === 'admin') {
           navigate('/admin-dashboard');
         } else if (response.user.role === 'technician') {

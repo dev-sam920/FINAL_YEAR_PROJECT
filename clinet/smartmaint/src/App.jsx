@@ -19,6 +19,7 @@ import { LoadingProvider, useLoading } from './context/LoadingContext.jsx';
 import SplashScreen from './components/SplashScreen.jsx';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import Analytics from './pages/admin/Analytics';
 import AllRequests from './pages/admin/AllRequests';
 import SupportTicketsAdmin from './pages/admin/SupportTickets';
 import PaymentsAdmin from './pages/admin/Payments';
@@ -165,6 +166,16 @@ const App = () => {
               <ProtectedRoute roles={["admin"]}>
                 <AdminLayout>
                   <AllRequests />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminLayout>
+                  <Analytics />
                 </AdminLayout>
               </ProtectedRoute>
             }

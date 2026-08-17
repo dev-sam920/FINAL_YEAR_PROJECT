@@ -1,17 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import loadingManager from '../utils/loadingManager.js';
 
-const LoadingContext = createContext({ activeRequests: 0, showSplash: false });
+const LoadingContext = createContext({ activeRequests: 0, showSplash: false, triggerSplash: () => {}, hideSplash: () => {} });
 
 export function LoadingProvider({ children }) {
   const [activeRequests, setActiveRequests] = useState(0);
-  const [navigating, setNavigating] = useState(false);
-  const [minElapsed, setMinElapsed] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const timerRef = useRef(null);
-  const location = useLocation();
-  const previousPathRef = useRef(location.pathname);
-  const authRoutes = useRef(new Set(['/login', '/signup', '/register']));
 
   useEffect(() => {
     const unsubscribe = loadingManager.onChange((count) => {
@@ -20,53 +15,25 @@ export function LoadingProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  // When location changes, mark navigating true and start/reset the minimum
-  // display timer so the splash stays visible for at least 3000ms.
-  useEffect(() => {
-    const nextPath = location.pathname;
-    const previousPath = previousPathRef.current;
-    const isAuthCrossNavigation =
-      authRoutes.current.has(previousPath) && authRoutes.current.has(nextPath);
-
-    previousPathRef.current = nextPath;
-
-    if (isAuthCrossNavigation) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      setNavigating(false);
-      setMinElapsed(true);
-      return;
-    }
-
-    setNavigating(true);
-    setMinElapsed(false);
-
+  const triggerSplash = (duration = 3000) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-
+    setShowSplash(true);
     timerRef.current = setTimeout(() => {
-      setMinElapsed(true);
+      setShowSplash(false);
       timerRef.current = null;
-    }, 3000);
+    }, duration);
+  };
 
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (navigating && minElapsed) {
-      // wait a frame so the new page has a chance to render, then clear
-      requestAnimationFrame(() => setNavigating(false));
+  const hideSplash = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
-  }, [navigating, minElapsed]);
+    setShowSplash(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -77,10 +44,8 @@ export function LoadingProvider({ children }) {
     };
   }, []);
 
-  const showSplash = navigating;
-
   return (
-    <LoadingContext.Provider value={{ activeRequests, showSplash }}>
+    <LoadingContext.Provider value={{ activeRequests, showSplash, triggerSplash, hideSplash }}>
       {children}
     </LoadingContext.Provider>
   );

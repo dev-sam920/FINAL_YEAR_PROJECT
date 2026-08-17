@@ -7,6 +7,8 @@ let cloudinary;
 let cloudinaryConfigured = false;
 let cloudinaryConfig = {};
 
+const DEFAULT_UPLOAD_TIMEOUT_MS = Number(process.env.CLOUDINARY_UPLOAD_TIMEOUT_MS || 8000);
+
 export const getCloudinaryConfig = (env = process.env) => {
   const config = {
     cloud_name: env.CLOUDINARY_CLOUD_NAME?.trim() || '',
@@ -119,6 +121,9 @@ const createCloudinaryStorage = (fieldNameToFolder) => ({
       public_id: publicId,
     };
 
+    // Ensure Cloudinary HTTP timeout is short to fail fast and fallback quickly
+    uploadOptions.timeout = DEFAULT_UPLOAD_TIMEOUT_MS;
+
     if (cloudinaryConfig.upload_preset) {
       uploadOptions.upload_preset = cloudinaryConfig.upload_preset;
     }
@@ -134,13 +139,32 @@ const createCloudinaryStorage = (fieldNameToFolder) => ({
     });
 
     if (!cloudinary?.uploader?.upload_stream) {
+      console.warn('[Cloudinary] upload_stream not available — using local storage fallback');
+      // mark fallback for visibility (so callers can detect fallbackLocal === true)
+      file.fallbackLocal = true;
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('[Cloudinary] Running in production with local fallback. Local uploads are ephemeral on serverless platforms and may be lost.');
+      }
       return writeFileToLocalStorage(file, folderName, req, cb);
     }
+    const timeoutMs = DEFAULT_UPLOAD_TIMEOUT_MS;
+    let timedOut = false;
 
     const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+        timeoutHandle = null;
+      }
+
+      if (timedOut) {
+        // already handled by timeout fallback
+        return;
+      }
+
       if (error) {
         console.error('Cloudinary error:', error);
         console.warn('[Cloudinary] falling back to local storage for upload');
+        file.fallbackLocal = true;
         return writeFileToLocalStorage(file, folderName, req, cb);
       }
 
@@ -150,7 +174,35 @@ const createCloudinaryStorage = (fieldNameToFolder) => ({
       cb(null, file);
     });
 
-    file.stream.pipe(uploadStream);
+    // Setup a timeout to avoid hanging when network is unreachable
+    let timeoutHandle = setTimeout(() => {
+      timedOut = true;
+      console.error(`[Cloudinary] upload timed out after ${timeoutMs}ms. Falling back to local storage.`);
+      try {
+        // attempt to unpipe/destroy the upload stream to free resources
+        try {
+          if (uploadStream && typeof uploadStream.destroy === 'function') uploadStream.destroy();
+        } catch (e) {
+          console.warn('[Cloudinary] failed to destroy upload stream after timeout', e?.message || e);
+        }
+      } finally {
+        file.fallbackLocal = true;
+        if (process.env.NODE_ENV === 'production') {
+          console.warn('[Cloudinary] Running in production with local fallback. Local uploads are ephemeral on serverless platforms and may be lost.');
+        }
+        return writeFileToLocalStorage(file, folderName, req, cb);
+      }
+    }, timeoutMs);
+
+    // Pipe the incoming stream into Cloudinary upload stream
+    try {
+      file.stream.pipe(uploadStream);
+    } catch (pipeErr) {
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+      console.error('[Cloudinary] failed to pipe stream to upload_stream', pipeErr);
+      file.fallbackLocal = true;
+      return writeFileToLocalStorage(file, folderName, req, cb);
+    }
   },
 
   _removeFile(req, file, cb) {

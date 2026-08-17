@@ -53,3 +53,38 @@ export async function setRequestCost(requestId, cost) {
   const resp = await axiosInstance.patch(`/admin/requests/${requestId}/set-cost`, { cost });
   return resp.data;
 }
+
+export async function getAnalyticsOverview() {
+  const resp = await axiosInstance.get('/admin/analytics/overview');
+  return resp.data;
+}
+
+export async function getRequestsOverTime(days = 30) {
+  const resp = await axiosInstance.get(`/admin/analytics/requests-over-time?days=${days}`);
+  return resp.data;
+}
+
+export async function getRevenueOverTime(days = 30) {
+  const resp = await axiosInstance.get(`/admin/analytics/revenue-over-time?days=${days}`);
+  return resp.data;
+}
+
+export async function getRequestsByCategory() {
+  const resp = await axiosInstance.get('/admin/analytics/requests-by-category');
+  return resp.data;
+}
+
+export async function getRequestsByStatus() {
+  const resp = await axiosInstance.get('/admin/analytics/requests-by-status');
+  return resp.data;
+}
+
+export async function getTopTechnicians() {
+  const resp = await axiosInstance.get('/admin/analytics/top-technicians');
+  return resp.data;
+}
+
+export async function getCompletedGrowth() {
+  const resp = await axiosInstance.get('/admin/analytics/completed-growth');
+  return resp.data;
+}

@@ -147,6 +147,237 @@ export const getAdminPayments = async (req, res) => {
   }
 };
 
+// --- Analytics endpoints ---
+export const getAnalyticsOverview = async (req, res) => {
+  try {
+    const totalRequests = await Request.countDocuments();
+
+    const paidRequests = await Request.find({ paymentStatus: 'paid' }).select('totalAmount platformFee').lean();
+    const totalRevenue = paidRequests.reduce((sum, r) => sum + (Number(r.totalAmount) || 0), 0);
+    const totalPlatformFees = paidRequests.reduce((sum, r) => sum + (Number(r.platformFee) || 0), 0);
+
+    const activeTechnicians = await User.countDocuments({ role: 'technician', accountStatus: { $ne: 'pending' } });
+
+    const ratingAgg = await Request.aggregate([
+      { $match: { rating: { $ne: null } } },
+      { $group: { _id: null, avgRating: { $avg: '$rating' } } },
+    ]);
+    const averageRequestRating = ratingAgg[0] ? Number(ratingAgg[0].avgRating.toFixed(1)) : null;
+
+    res.status(200).json({ totalRequests, totalRevenue, totalPlatformFees, activeTechnicians, averageRequestRating });
+  } catch (error) {
+    console.error('Failed to load analytics overview', error);
+    res.status(500).json({ message: error.message || 'Failed to load analytics overview' });
+  }
+};
+
+const fillDateSeries = (startDate, days, map) => {
+  const series = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    series.push({ date: key, value: map[key] || 0 });
+  }
+  return series;
+};
+
+export const getRequestsOverTime = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days, 10) || 30;
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+
+    const agg = await Request.aggregate([
+      { $match: { createdAt: { $gte: start } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const map = {};
+    agg.forEach((r) => { map[r._id] = r.count; });
+    const series = fillDateSeries(start, days, map).map((s) => ({ date: s.date, count: s.value }));
+
+    res.status(200).json({ series });
+  } catch (error) {
+    console.error('Failed to load requests over time', error);
+    res.status(500).json({ message: error.message || 'Failed to load requests over time' });
+  }
+};
+
+export const getRevenueOverTime = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days, 10) || 30;
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+
+    const agg = await Request.aggregate([
+      { $match: { createdAt: { $gte: start }, paymentStatus: 'paid' } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, revenue: { $sum: { $ifNull: ['$totalAmount', 0] } } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const map = {};
+    agg.forEach((r) => { map[r._id] = r.revenue; });
+    const series = fillDateSeries(start, days, map).map((s) => ({ date: s.date, revenue: s.value }));
+
+    res.status(200).json({ series });
+  } catch (error) {
+    console.error('Failed to load revenue over time', error);
+    res.status(500).json({ message: error.message || 'Failed to load revenue over time' });
+  }
+};
+
+export const getRequestsByCategory = async (req, res) => {
+  try {
+    const agg = await Request.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    const data = agg.map((a) => ({ category: a._id || 'Unspecified', count: a.count }));
+    res.status(200).json({ data });
+  } catch (error) {
+    console.error('Failed to load requests by category', error);
+    res.status(500).json({ message: error.message || 'Failed to load requests by category' });
+  }
+};
+
+export const getRequestsByStatus = async (req, res) => {
+  try {
+    const agg = await Request.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+    const map = {};
+    agg.forEach((a) => { map[a._id] = a.count; });
+    const statuses = ['submitted', 'assigned', 'acknowledged', 'in-progress', 'completed'];
+    const data = statuses.map((s) => ({ status: s, count: map[s] || 0 }));
+    res.status(200).json({ data });
+  } catch (error) {
+    console.error('Failed to load requests by status', error);
+    res.status(500).json({ message: error.message || 'Failed to load requests by status' });
+  }
+};
+
+export const getTopTechnicians = async (req, res) => {
+  try {
+    const agg = await Request.aggregate([
+      { $match: { assignedTechnician: { $ne: null } } },
+      { $group: { _id: '$assignedTechnician', avgRating: { $avg: '$rating' }, completedCount: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] } } } },
+      { $sort: { avgRating: -1, completedCount: -1 } },
+      { $limit: 5 },
+      { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      { $project: { technicianId: '$_id', avgRating: { $ifNull: ['$avgRating', null] }, completedCount: 1, fullName: '$user.fullName', profilePicture: '$user.profilePicture' } },
+    ]);
+
+    res.status(200).json({ technicians: agg });
+  } catch (error) {
+    console.error('Failed to load top technicians', error);
+    res.status(500).json({ message: error.message || 'Failed to load top technicians' });
+  }
+};
+
+export const getCompletedGrowth = async (req, res) => {
+  try {
+    // Weekly: last 12 weeks (starting Monday)
+    const weeks = 12;
+    const now = new Date();
+    // compute earliest date for weeks: start of week (Monday) 11 weeks ago
+    const tmp = new Date(now);
+    const day = (tmp.getDay() + 6) % 7; // 0..6 where 0 is Monday
+    tmp.setHours(0, 0, 0, 0);
+    tmp.setDate(tmp.getDate() - day); // start of current week (Monday)
+    const weekStart = new Date(tmp);
+    weekStart.setDate(weekStart.getDate() - (weeks - 1) * 7);
+
+    // Monthly: last 12 months, earliest month start
+    const months = 12;
+    const monthStart = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+
+    // Query completed requests since earliest of weekStart or monthStart
+    const earliest = weekStart < monthStart ? weekStart : monthStart;
+
+    const completed = await Request.find({ status: 'completed', updatedAt: { $gte: earliest } }).select('updatedAt').lean();
+
+    // Bucket weekly
+    const weekMap = {};
+    const weekLabels = [];
+    for (let i = 0; i < weeks; i++) {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i * 7);
+      const key = d.toISOString().slice(0, 10);
+      weekMap[key] = 0;
+      weekLabels.push(key);
+    }
+
+    completed.forEach((r) => {
+      const d = new Date(r.updatedAt || r.createdAt);
+      // find Monday of that week
+      const dayOfWeek = (d.getDay() + 6) % 7;
+      const monday = new Date(d);
+      monday.setHours(0, 0, 0, 0);
+      monday.setDate(monday.getDate() - dayOfWeek);
+      const key = monday.toISOString().slice(0, 10);
+      if (Object.prototype.hasOwnProperty.call(weekMap, key)) {
+        weekMap[key] += 1;
+      }
+    });
+
+    const weeklySeries = weekLabels.map((k) => ({ weekStart: k, count: weekMap[k] || 0 }));
+
+    // compute week over week growth (compare last two weeks)
+    const last = weeklySeries[weeklySeries.length - 1]?.count || 0;
+    const prev = weeklySeries[weeklySeries.length - 2]?.count || 0;
+    let weekOverWeekGrowth = null;
+    if (prev === 0) {
+      weekOverWeekGrowth = prev === last ? 0 : null;
+    } else {
+      weekOverWeekGrowth = Number((((last - prev) / prev) * 100).toFixed(1));
+    }
+
+    // Bucket monthly
+    const monthMap = {};
+    const monthLabels = [];
+    for (let i = 0; i < months; i++) {
+      const m = new Date(now.getFullYear(), now.getMonth() - (months - 1) + i, 1);
+      const key = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}`;
+      monthMap[key] = 0;
+      monthLabels.push(key);
+    }
+
+    completed.forEach((r) => {
+      const d = new Date(r.updatedAt || r.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (Object.prototype.hasOwnProperty.call(monthMap, key)) {
+        monthMap[key] += 1;
+      }
+    });
+
+    const monthlySeries = monthLabels.map((k) => ({ month: k, count: monthMap[k] || 0 }));
+
+    const lastMonth = monthlySeries[monthlySeries.length - 1]?.count || 0;
+    const prevMonth = monthlySeries[monthlySeries.length - 2]?.count || 0;
+    let monthOverMonthGrowth = null;
+    if (prevMonth === 0) {
+      monthOverMonthGrowth = prevMonth === lastMonth ? 0 : null;
+    } else {
+      monthOverMonthGrowth = Number((((lastMonth - prevMonth) / prevMonth) * 100).toFixed(1));
+    }
+
+    res.status(200).json({
+      weekly: { series: weeklySeries, weekOverWeekGrowth },
+      monthly: { series: monthlySeries, monthOverMonthGrowth },
+    });
+  } catch (error) {
+    console.error('Failed to load completed growth', error);
+    res.status(500).json({ message: error.message || 'Failed to load completed growth' });
+  }
+};
+
+
+
 const generateTemporaryPassword = () => {
   const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   const lower = 'abcdefghijkmnopqrstuvwxyz';
