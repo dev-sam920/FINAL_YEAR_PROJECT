@@ -201,11 +201,19 @@ export default function ClientDashboard() {
   };
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   const handleSubmitNewRequest = () => {
-    navigate('/submit-request');
+    try {
+      navigate('/submit-request');
+    } catch (error) {
+      console.error('Navigation failed:', error);
+    }
   };
 
   return (
@@ -213,10 +221,7 @@ export default function ClientDashboard() {
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
-            <p style={{ margin: 0, color: '#6B7280', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-              Client Dashboard
-            </p>
-            <h1 style={{ margin: '0.75rem 0 0', fontSize: '2.5rem', lineHeight: 1.05 }}>
+            <h1 style={{ margin: 0, fontSize: '2.5rem', lineHeight: 1.05 }}>
               Welcome, {user?.fullName || 'Client'}
             </h1>
             <p style={{ margin: '0.85rem 0 0', color: '#6B7280' }}>{user?.email || 'No email available'}</p>

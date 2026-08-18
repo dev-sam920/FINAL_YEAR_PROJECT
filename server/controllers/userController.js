@@ -79,6 +79,17 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+// Expose current user (sanitized) for use after changes
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json({ user: buildUserResponse(user, req) });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to fetch user' });
+  }
+};
+
 export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;

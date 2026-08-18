@@ -36,6 +36,12 @@
   margin-bottom: 32px;
 }
 
+/* Ensure profile card sits above transient overlays that might block interaction */
+.profile-card {
+  position: relative;
+  z-index: 1200;
+}
+
 .profile-card h2 {
   font-size: 20px;
   font-weight: 700;
@@ -89,6 +95,13 @@ select.form-input {
   box-shadow: inset 0 0 0 1px #E2E5EA;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Defensive: ensure inputs are interactive even if a global debug override is present */
+.profile-card .form-input,
+.profile-card select.form-input,
+.profile-card .form-textarea {
+  pointer-events: auto !important;
 }
 
 .form-input:hover,

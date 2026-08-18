@@ -26,7 +26,7 @@ export async function updateProfile({ fullName, phone, unitAddress, address, sta
 
 export async function changePassword({ currentPassword, newPassword }) {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+    const response = await fetch(`${API_BASE_URL}/client/change-password`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -43,6 +43,41 @@ export async function changePassword({ currentPassword, newPassword }) {
     return data;
   } catch (error) {
     throw new Error(error.message || 'An error occurred while changing password');
+  }
+}
+
+export async function updateNotificationPreferences({ emailNotifications, inAppNotifications }) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/client/notification-preferences`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ emailNotifications, inAppNotifications }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to update preferences');
+    return data;
+  } catch (error) {
+    throw new Error(error.message || 'Failed to update preferences');
+  }
+}
+
+// Client account deletion helper
+export async function deleteAccount(password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/client/account`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to delete account');
+    return data;
+  } catch (error) {
+    throw new Error(error.message || 'Failed to delete account');
   }
 }
 

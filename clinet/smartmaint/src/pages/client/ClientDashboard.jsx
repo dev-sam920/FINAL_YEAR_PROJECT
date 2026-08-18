@@ -133,12 +133,12 @@ export default function ClientDashboard() {
 
   return (
     <>
-      {/* Main Content */}
-      <div className="main-content">
-        {/* Top Navbar */}
+                      <span className={`badge badge-priority-${request.priority.toLowerCase()}`}>
+                        {request.priority}
+                      </span>
         <header className="top-navbar">
           <div className="navbar-search">
-            <span className="search-icon">🔍</span>
+                      <span className={`badge badge-status-${request.status.toLowerCase().replace(/\s/g, '-')}`}>{request.status}</span>
             <input
               type="text"
               placeholder="Search requests... ⌘K"

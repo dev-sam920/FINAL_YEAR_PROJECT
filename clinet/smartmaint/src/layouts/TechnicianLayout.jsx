@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { LayoutDashboard, ClipboardList, CreditCard, User, LogOut } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import ForcePasswordChangeModal from '../components/ForcePasswordChangeModal';
 import NotificationBell from '../components/NotificationBell';
@@ -14,20 +15,20 @@ export default function TechnicianLayout({ children }) {
     {
       title: 'General',
       items: [
-        { label: 'Dashboard', path: '/technician-dashboard' },
-        { label: 'My Assignments', path: '/my-assignments' },
+        { label: 'Dashboard', path: '/technician-dashboard', icon: <LayoutDashboard size={18} /> },
+        { label: 'My Assignments', path: '/my-assignments', icon: <ClipboardList size={18} /> },
       ],
     },
     {
       title: 'Payments',
       items: [
-        { label: 'Withdraw', path: '/technician/withdraw' },
+        { label: 'Withdraw', path: '/technician/withdraw', icon: <CreditCard size={18} /> },
       ],
     },
     {
       title: 'Account',
       items: [
-        { label: 'Profile', path: '/technician-profile' },
+        { label: 'Profile', path: '/technician-profile', icon: <User size={18} /> },
       ],
     },
   ];
@@ -71,7 +72,10 @@ export default function TechnicianLayout({ children }) {
                   className={`admin-nav-link ${location.pathname === item.path ? 'active' : ''}`}
                   onClick={closeMenu}
                 >
-                  {item.label}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', color: 'inherit' }}>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </span>
                 </NavLink>
               ))}
             </div>

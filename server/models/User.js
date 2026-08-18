@@ -128,6 +128,22 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    emailNotifications: {
+      type: Boolean,
+      default: true,
+    },
+    inAppNotifications: {
+      type: Boolean,
+      default: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

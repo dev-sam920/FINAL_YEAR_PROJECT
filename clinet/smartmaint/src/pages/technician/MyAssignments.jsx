@@ -193,8 +193,8 @@ export default function MyAssignments() {
                     <div style={{ marginTop: 6, color: '#6B7280', fontSize: 13 }}>{request.category || 'General'} · {request.location || 'Location not provided'}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <span style={{ padding: '0.35rem 0.8rem', borderRadius: 9999, fontSize: 12, fontWeight: 700, ...priorityBadgeStyles[request.priority || 'Medium'] }}>{request.priority || 'Medium'}</span>
-                    <span style={{ padding: '0.35rem 0.8rem', borderRadius: 9999, fontSize: 12, fontWeight: 700, ...statusBadgeStyles[status] }}>{getStatusLabel(status)}</span>
+                    <span className={`request-badge priority-${(request.priority || 'Medium').toLowerCase()}`}>{request.priority || 'Medium'}</span>
+                    <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
                   </div>
                 </div>
 

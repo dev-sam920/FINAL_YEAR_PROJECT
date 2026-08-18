@@ -197,24 +197,25 @@
 .priority-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.35rem 0.7rem;
+  justify-content: center;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .priority-badge.high {
-  background-color: #FEE2E2;
+  background: rgba(220, 38, 38, 0.12);
   color: #DC2626;
 }
 
 .priority-badge.medium {
-  background-color: #FEF3C7;
+  background: rgba(245, 158, 11, 0.12);
   color: #D97706;
 }
 
 .priority-badge.low {
-  background-color: #DBEAFE;
+  background: rgba(66, 133, 244, 0.12);
   color: #2563EB;
 }
 
@@ -222,9 +223,10 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.35rem 0.7rem;
+  justify-content: center;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 

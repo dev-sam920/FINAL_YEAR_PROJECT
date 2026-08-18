@@ -6,6 +6,7 @@ import Signup from './components/Signup';
 import ClientDashboard from './pages/ClientDashboard';
 import SubmitRequest from './pages/client/SubmitRequest';
 import Profile from './pages/client/Profile';
+import Settings from './pages/client/Settings';
 import CompleteProfile from './pages/client/CompleteProfile';
 import Support from './pages/client/Support';
 import MyRequests from './pages/client/MyRequests';
@@ -87,6 +88,16 @@ const App = () => {
               <ClientProtectedRoute>
                 <ClientLayout>
                   <Profile />
+                </ClientLayout>
+              </ClientProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ClientProtectedRoute>
+                <ClientLayout>
+                  <Settings />
                 </ClientLayout>
               </ClientProtectedRoute>
             }

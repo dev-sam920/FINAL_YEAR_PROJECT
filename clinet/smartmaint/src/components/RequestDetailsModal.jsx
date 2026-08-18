@@ -188,28 +188,8 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
         </div>
 
         <div style={{ marginTop: '1.15rem', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <span
-            style={{
-              padding: '0.35rem 0.8rem',
-              borderRadius: 9999,
-              fontSize: 12,
-              fontWeight: 700,
-              ...priorityBadgeStyles[request.priority || 'Medium'],
-            }}
-          >
-            {request.priority || 'Medium'}
-          </span>
-          <span
-            style={{
-              padding: '0.35rem 0.8rem',
-              borderRadius: 9999,
-              fontSize: 12,
-              fontWeight: 700,
-              ...statusBadgeStyles[status],
-            }}
-          >
-            {getStatusLabel(status)}
-          </span>
+          <span className={`request-badge priority-${(request.priority || 'Medium').toLowerCase()}`}>{request.priority || 'Medium'}</span>
+          <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
         </div>
 
         <div style={{ marginTop: '1.25rem' }}>
@@ -278,9 +258,6 @@ export default function RequestDetailsModal({ request, onClose, onRate, onEmojiF
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, borderTop: '1px solid #E5E7EB', paddingTop: 8 }}>
                     <span style={{ color: '#111111', fontWeight: 700 }}>Total due</span>
                     <span style={{ fontWeight: 700, color: '#0F1642' }}>₦{Number(request.totalAmount || 0).toLocaleString()}</span>
-                  </div>
-                  <div style={{ marginTop: 8, color: '#6B7280', fontSize: 13 }}>
-                    This is the exact amount you will be charged. Platform fees are deducted from the technician payout.
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
                     {request.paymentStatus === 'paid' ? (

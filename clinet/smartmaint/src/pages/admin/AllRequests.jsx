@@ -22,20 +22,20 @@ const getStatusLabel = (value) => {
   return value || 'Unknown';
 };
 
-const getPriorityBadgeStyle = (priority) => {
+  const getPriorityBadgeStyle = (priority) => {
   const normalized = String(priority || '').toLowerCase();
-  if (normalized === 'high') return { background: '#FEE2E2', color: '#DC2626' };
-  if (normalized === 'medium') return { background: '#FEF3C7', color: '#D97706' };
-  return { background: '#DBEAFE', color: '#2563EB' };
+  if (normalized === 'high') return { background: 'rgba(220, 38, 38, 0.12)', color: '#DC2626' };
+  if (normalized === 'medium') return { background: 'rgba(245, 158, 11, 0.12)', color: '#D97706' };
+  return { background: 'rgba(66, 133, 244, 0.12)', color: '#2563EB' };
 };
 
 const getStatusBadgeStyle = (value) => {
   const normalized = normalizeStatusValue(value);
-  if (normalized === 'submitted') return { background: '#DBEAFE', color: '#2563EB' };
-  if (normalized === 'assigned') return { background: '#FEF3C7', color: '#B45309' };
-  if (normalized === 'acknowledged') return { background: '#DBEAFE', color: '#2563EB' };
-  if (normalized === 'in-progress') return { background: '#FEF3C7', color: '#D97706' };
-  if (normalized === 'completed') return { background: '#D1FAE5', color: '#059669' };
+  if (normalized === 'submitted') return { background: '#0F1642', color: '#FFFFFF' };
+  if (normalized === 'assigned') return { background: '#F59E0B', color: '#111827' };
+  if (normalized === 'acknowledged') return { background: '#E5E7EB', color: '#111827' };
+  if (normalized === 'in-progress') return { background: '#E8F1FF', color: '#2563EB' };
+  if (normalized === 'completed') return { background: '#041F18', color: '#FFFFFF' };
   return { background: '#F3F4F6', color: '#6B7280' };
 };
 

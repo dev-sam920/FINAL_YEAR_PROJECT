@@ -108,7 +108,7 @@
   color: #f5f7ff;
   border: none;
   border-radius: 14px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -132,8 +132,8 @@
 }
 
 .client-nav-icon {
-  font-size: 16px;
-  width: 18px;
+  font-size: 18px;
+  width: 22px;
   display: inline-flex;
   justify-content: center;
 }
@@ -210,7 +210,7 @@
   color: #ffffff;
   border: none;
   border-radius: 14px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -223,7 +223,7 @@
 }
 
 .client-logout-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .client-logout-text {

@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ClientSidebar.css';
 import { AuthContext } from '../../context/AuthContext';
+import { LayoutDashboard, ClipboardList, PlusCircle, CreditCard, User, HelpCircle, LogOut } from 'lucide-react';
 
 export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav }) {
   const navigate = useNavigate();
@@ -58,29 +59,30 @@ export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav })
     {
       title: '',
       items: [
-        { id: 'dashboard', label: 'Dashboard', route: '/client-dashboard', icon: '🏠' },
+        { id: 'dashboard', label: 'Dashboard', route: '/client-dashboard', icon: <LayoutDashboard size={18} /> },
       ],
     },
     {
       title: 'Requests',
       items: [
-        { id: 'requests', label: 'My Requests', route: '/my-requests', icon: '📋' },
-        { id: 'submit', label: 'Submit Request', route: '/submit-request', icon: '➕' },
+        { id: 'requests', label: 'My Requests', route: '/my-requests', icon: <ClipboardList size={18} /> },
+        { id: 'submit', label: 'Submit Request', route: '/submit-request', icon: <PlusCircle size={18} /> },
       ],
     },
     {
       title: 'Payments',
       items: [
-        { id: 'payments', label: 'Payments', route: '/payments', icon: '💳' },
+        { id: 'payments', label: 'Payments', route: '/payments', icon: <CreditCard size={18} /> },
       ],
     },
-    {
-      title: 'Account',
-      items: [
-        { id: 'profile', label: 'Profile', route: '/profile', icon: '👤' },
-        { id: 'support', label: 'Support', route: '/support', icon: '❓' },
-      ],
-    },
+        {
+          title: 'Account',
+          items: [
+            { id: 'profile', label: 'Profile', route: '/profile', icon: <User size={18} /> },
+            { id: 'settings', label: 'Settings', route: '/settings', icon: <CreditCard size={18} /> },
+            { id: 'support', label: 'Support', route: '/support', icon: <HelpCircle size={18} /> },
+          ],
+        },
   ];
 
   return (
@@ -126,7 +128,7 @@ export default function ClientSidebar({ activeNav = 'dashboard', setActiveNav })
             logout();
           }}
         >
-          <span className="client-logout-icon">🚪</span>
+          <span className="client-logout-icon"><LogOut size={18} /></span>
           <span className="client-logout-text">Logout</span>
         </button>
       </div>

@@ -1,0 +1,56 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  min-height: 28px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+/* Priority variants */
+.badge--priority-low {
+  background: rgba(66, 133, 244, 0.12);
+  color: #2563EB; /* blue */
+}
+
+.badge--priority-medium {
+  background: rgba(245, 158, 11, 0.12);
+  color: #D97706; /* amber */
+}
+
+.badge--priority-high {
+  background: rgba(220, 38, 38, 0.12);
+  color: #DC2626; /* red */
+}
+
+/* Status variants */
+.badge--status-submitted {
+  background: #0F1642;
+  color: #FFFFFF;
+}
+
+.badge--status-assigned {
+  background: #F59E0B;
+  color: #111827;
+}
+
+.badge--status-acknowledged {
+  background: #E5E7EB;
+  color: #111827;
+}
+
+.badge--status-in-progress {
+  background: #E8F1FF;
+  color: #2563EB;
+}
+
+.badge--status-completed {
+  background: #041F18;
+  color: #FFFFFF;
+}
