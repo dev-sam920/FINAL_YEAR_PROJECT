@@ -172,6 +172,26 @@ select.form-input:focus {
   cursor: not-allowed;
 }
 
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #DC2626;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #b52222;
+  transform: translateY(-1px);
+}
+
 .btn-primary .btn-icon {
   font-family: 'Material Symbols Outlined';
   font-size: 18px;

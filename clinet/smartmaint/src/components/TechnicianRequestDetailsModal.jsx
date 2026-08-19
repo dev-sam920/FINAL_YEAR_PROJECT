@@ -72,8 +72,8 @@ export default function TechnicianRequestDetailsModal({ request, onClose }) {
         <h2 style={{ margin: '0.6rem 0 0', fontSize: '1.7rem' }}>{request.title || 'Maintenance Request'}</h2>
 
         <div style={{ marginTop: '1rem', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ padding: '0.35rem 0.8rem', borderRadius: 9999, fontSize: 12, fontWeight: 700, ...priorityBadgeStyles[request.priority || 'Medium'] }}>{request.priority || 'Medium'}</span>
-          <span style={{ padding: '0.35rem 0.8rem', borderRadius: 9999, fontSize: 12, fontWeight: 700, ...statusBadgeStyles[status] }}>{getStatusLabel(status)}</span>
+          <span className={`request-badge priority-${(request.priority || 'Medium').toLowerCase()}`}>{request.priority || 'Medium'}</span>
+          <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
         </div>
 
         <div style={{ marginTop: '1.25rem' }}><StatusTimeline currentStatus={status} /></div>

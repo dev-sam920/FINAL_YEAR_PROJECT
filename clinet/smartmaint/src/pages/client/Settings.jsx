@@ -159,7 +159,7 @@ function DeleteAccountCard({ setUser, logout }) {
     <div>
       {message && <div className="message-banner success-banner">✓ {message}</div>}
       {error && <div className="message-banner error-banner">✕ {error}</div>}
-      <button className="btn-save-changes" type="button" onClick={() => setOpen(true)} style={{ background: '#fff1f0', color: '#7a1f1f', border: '1px solid rgba(220,38,38,0.16)' }}>Delete Account</button>
+      <button className="btn-danger" type="button" onClick={() => setOpen(true)}>Delete Account</button>
 
       {open && (
         <div className="modal-overlay">
@@ -172,7 +172,7 @@ function DeleteAccountCard({ setUser, logout }) {
               <p style={{ color: '#7a1f1f' }}>This action cannot be undone. Type your password to confirm account deletion.</p>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-input" placeholder="Enter your password" />
               <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                <button className="btn-primary" type="button" onClick={confirmDelete} disabled={loading} style={{ background: '#DC2626' }}>{loading ? 'Deleting...' : 'Confirm Delete'}</button>
+                <button className="btn-danger" type="button" onClick={confirmDelete} disabled={loading}>{loading ? 'Deleting...' : 'Confirm Delete'}</button>
                 <button className="btn-primary" type="button" onClick={() => setOpen(false)} style={{ background: '#E5E7EB', color: '#111' }}>Cancel</button>
               </div>
             </div>

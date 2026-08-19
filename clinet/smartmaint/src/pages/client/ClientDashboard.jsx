@@ -186,7 +186,7 @@ export default function ClientDashboard() {
             className="btn-submit-new"
             onClick={() => navigate('/submit-request')}
           >
-            + Submit New Request
+            + Submit New Request  
           </button>
         </div>
 
