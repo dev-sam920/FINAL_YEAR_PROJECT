@@ -2,15 +2,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 14px;
-  border-radius: 999px;
-  min-height: 28px;
-  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: fit-content;
+  height: auto;
+  min-height: 0;
+  font-size: 12px;
   font-weight: 700;
   font-family: 'Montserrat', sans-serif;
   line-height: 1;
   white-space: nowrap;
   text-transform: none;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
 /* Priority variants */
@@ -53,4 +57,32 @@
 .badge--status-completed {
   background: #041F18;
   color: #FFFFFF;
+}
+
+/* Normalize other badge class names used across the app so they inherit the same fitted pill styling */
+.request-badge,
+.recent-request-badge,
+.priority-badge,
+.status-badge,
+.page-badge,
+.admin-payment-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
+  width: fit-content !important;
+  height: auto !important;
+  min-height: 0 !important;
+  white-space: nowrap !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure very short labels don't become circles by preventing excessive min-widths */
+.request-badge[style], .recent-request-badge[style] {
+  min-width: 0 !important;
+  min-height: 0 !important;
 }
