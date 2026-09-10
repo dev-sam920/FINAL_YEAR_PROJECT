@@ -30,6 +30,9 @@ const createApp = async () => {
     const isProduction = String(process.env.NODE_ENV).toLowerCase() === 'production';
     const allowedOrigins = [
       ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+      'https://smartmaint.vercel.app',
+      'https://www.smartmaint.com.ng',
+      'https://smartmaint.com.ng',
       ...(!isProduction ? [
         'http://localhost:5173',
         'http://localhost:5174',

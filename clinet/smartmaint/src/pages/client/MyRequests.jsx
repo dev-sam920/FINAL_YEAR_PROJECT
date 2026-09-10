@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { getMyRequests, rateRequest } from '../../api/requests';
@@ -16,7 +17,8 @@ const statusLabelMap = {
 };
 
 const getStatusLabel = (status) => statusLabelMap[status] || status || 'Submitted';
-const getStatusSlug = (status) => (status || 'submitted').toLowerCase().replace(/\s+/g, '-');
+const normalizeStatusValue = (status) => String(status || '').trim().toLowerCase().replace(/[\s_]+/g, '-');
+const getStatusSlug = (status) => normalizeStatusValue(status || 'submitted');
 const getPrioritySlug = (priority) => (priority || 'medium').toLowerCase();
 
 const RequestCard = ({ request, onOpenDetails, onPayNow }) => {
@@ -138,9 +140,11 @@ export default function MyRequests() {
 
   const filtered = useMemo(() => {
     return requests.filter((r) => {
-      const currentStatus = (r.status || '').toLowerCase();
-      if (statusFilter !== 'All' && currentStatus !== statusFilter.toLowerCase()) return false;
+      const matchesStatus = statusFilter === 'All' || normalizeStatusValue(r.status) === normalizeStatusValue(statusFilter);
+      if (!matchesStatus) return false;
+
       if (!query) return true;
+
       const q = query.toLowerCase();
       return (r.title || '').toLowerCase().includes(q) || (r.category || '').toLowerCase().includes(q);
     });
@@ -192,9 +196,6 @@ export default function MyRequests() {
             <h1 className="page-title">All your requests</h1>
             <p className="page-subtitle">{user?.email || 'No email available'}</p>
           </div>
-          <button className="btn-submit-new" type="button" onClick={() => navigate('/submit-request')}>
-            + Submit New Request
-          </button>
         </section>
 
         <section className="requests-toolbar">
@@ -204,10 +205,7 @@ export default function MyRequests() {
                 key={status}
                 type="button"
                 className={`status-pill ${statusFilter === status ? 'active' : ''}`}
-                onClick={() => {
-                  setStatusFilter(status);
-                  setQuery('');
-                }}
+                onClick={() => setStatusFilter(status)}
               >
                 {status}
               </button>
@@ -215,7 +213,7 @@ export default function MyRequests() {
           </div>
 
           <div className="search-wrapper">
-            <span className="search-icon">🔍</span>
+            <Search className="search-icon" size={18} strokeWidth={2.2} />
             <input
               className="search-input"
               placeholder="Search by title or category"

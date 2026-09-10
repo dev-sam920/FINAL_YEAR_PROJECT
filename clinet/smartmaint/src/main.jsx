@@ -2,8 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/theme.css'
 import './index.css'
-// Debug overrides (temporary) to help unblock clickability issues during local testing
-import './styles/debug-overrides.css'
 import App from './App.jsx'
 import loadingManager from './utils/loadingManager.js'
 import axiosInstance from './utils/axiosInstance.js'
