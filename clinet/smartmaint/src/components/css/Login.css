@@ -98,6 +98,9 @@ textarea:focus {
     flex-direction: row;
     padding: 40px;
     align-items: stretch;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
   }
 }
 
@@ -133,11 +136,13 @@ textarea:focus {
     width: 50%;
     max-width: 500px;
     min-height: 600px;
+    height: auto;
     padding: 64px;
     justify-content: flex-start;
     background-color: #faf9f8;
     border-radius: 8px;
     overflow-y: visible;
+    align-self: stretch;
   }
 }
 
@@ -662,12 +667,15 @@ textarea:focus {
 @media (min-width: 768px) {
   .login-right {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
+    width: 50%;
     max-width: 500px;
     min-height: 600px;
+    height: auto;
     border-radius: 8px;
     align-self: stretch;
+    flex: 1;
   }
 }
 
@@ -704,35 +712,25 @@ textarea:focus {
   right: 24px;
   z-index: 20;
   color: #ffffff;
-  max-width: 280px;
-}
-
-.caption-divider {
-  height: 1px;
-  width: 48px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-container));
-  margin-bottom: 24px;
-}
-
-.caption-label {
-  font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.15em;
-  font-weight: 600;
-  text-transform: uppercase;
-  opacity: 0.8;
-  margin-bottom: 8px;
-  margin: 0;
+  max-width: 310px;
+  padding-left: 0;
 }
 
 .caption-quote {
   font-family: var(--font-headline);
-  font-size: 18px;
-  line-height: 1.5;
-  font-weight: 400;
-  opacity: 0.95;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 600;
+  opacity: 0.98;
   margin: 0;
+}
+
+.caption-subtitle {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 /* Custom Scrollbar */

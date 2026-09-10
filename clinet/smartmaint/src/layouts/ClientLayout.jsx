@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import ClientSidebar from '../components/client/ClientSidebar.jsx';
 import NotificationBell from '../components/NotificationBell.jsx';
@@ -24,7 +25,7 @@ export default function ClientLayout({ children }) {
       <div className="client-main">
         <header className="client-topbar">
           <div className="client-topbar-search">
-            <span className="topbar-search-icon">🔍</span>
+            <Search className="topbar-search-icon" size={18} color="#9ca3af" style={{ display: 'block', flexShrink: 0 }} />
             <input
               type="search"
               className="topbar-search-input"

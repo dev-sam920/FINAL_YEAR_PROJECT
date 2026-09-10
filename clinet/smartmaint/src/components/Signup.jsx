@@ -3,11 +3,12 @@ import { signInWithPopup } from 'firebase/auth';
 import NaijaStates from 'naija-state-local-government';
 import { useNavigate } from 'react-router-dom';
 import { googleAuth, signupUser, technicianSignupUser } from '../api/auth';
-import heroImage from '../assets/hero.png';
 import { auth, googleProvider } from './firebase';
 import { AuthContext } from '../context/AuthContext';
 import { useLoading } from '../context/LoadingContext';
 import './css/Signup.css';
+
+const heroImage = 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80';
 
 const specialtyOptions = ['Plumbing', 'Electrical', 'HVAC', 'Structural', 'Appliance', 'General'];
 const stateOptions = [
@@ -684,20 +685,16 @@ export default function Signup() {
         </footer>
       </section>
 
-      <section className="signup-right">
-        <div
-          className="signup-image"
-          style={{
-            backgroundImage: `url(${heroImage})`
-          }}
-        ></div>
-
+      <section className="signup-right" style={{
+        backgroundImage: `linear-gradient(to top, rgba(11,20,38,0.85), rgba(11,20,38,0.1)), url(${heroImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
         <div className="signup-overlay"></div>
 
         <div className="signup-caption">
-          <div className="caption-divider"></div>
-          <p className="caption-label">CURATED SPACES</p>
-          <p className="caption-quote">"Excellence is not an act, but a habit of meticulous stewardship."</p>
+          <p className="caption-quote">Every request, tracked and resolved.</p>
+          <p className="caption-subtitle">Smart support for homes, offices, and everyday maintenance.</p>
         </div>
 
         <div className="signup-grid">

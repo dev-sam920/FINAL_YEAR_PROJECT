@@ -3,8 +3,12 @@
 
 /* ===== COLOR VARIABLES ===== */
 :root {
-  --primary: #001b0f;
-  --landing-accent: #4285F4;
+  --color-navy: #0B1330;
+  --color-navy-hover: #1A2547;
+  --color-butter: #F3E1A0;
+  --color-butter-hover: #EAD37E;
+  --primary: var(--color-navy);
+  --landing-accent: var(--color-navy);
   --on-primary: #ffffff;
   --surface: #faf9f8;
   --surface-variant: #e3e2e1;
@@ -252,7 +256,7 @@ nav.scrolled .nav-container {
   font-family: 'Satoshi', sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-navy);
   letter-spacing: -0.02em;
 }
 
@@ -275,12 +279,12 @@ nav.scrolled .nav-container {
 }
 
 .nav-link.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
+  color: var(--color-navy);
+  border-bottom-color: var(--color-navy);
 }
 
 .nav-link:hover {
-  color: var(--primary);
+  color: var(--color-navy);
   transition: color 0.3s ease;
 }
 
@@ -302,7 +306,7 @@ nav.scrolled .nav-container {
 }
 
 .nav-button-login {
-  color: var(--primary);
+  color: var(--color-navy);
 }
 
 .nav-button-login:hover {
@@ -310,7 +314,7 @@ nav.scrolled .nav-container {
 }
 
 .nav-button-register {
-  background-color: var(--landing-accent);
+  background-color: var(--color-navy);
   color: white;
   padding: 12px 32px;
   border-radius: 9999px;
@@ -318,7 +322,7 @@ nav.scrolled .nav-container {
 }
 
 .nav-button-register:hover {
-  opacity: 0.9;
+  background-color: var(--color-navy-hover);
 }
 
 @media (max-width: 768px) {
@@ -368,7 +372,7 @@ nav.scrolled .nav-container {
   line-height: 0.95;
   font-weight: 700;
   letter-spacing: -0.04em;
-  color: var(--primary);
+  color: var(--color-navy);
 }
 
 .hero-description {
@@ -387,8 +391,8 @@ nav.scrolled .nav-container {
 }
 
 .btn-primary {
-  background-color: var(--landing-accent);
-  color: white;
+  background-color: var(--color-butter);
+  color: var(--color-navy);
   padding: 20px 40px;
   border: none;
   border-radius: 9999px;
@@ -401,6 +405,7 @@ nav.scrolled .nav-container {
 }
 
 .btn-primary:hover {
+  background-color: var(--color-butter-hover);
   transform: scale(1.02);
 }
 
@@ -417,15 +422,16 @@ nav.scrolled .nav-container {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 1px solid var(--landing-accent);
+  border: 1px solid var(--color-navy);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-navy);
   transition: all 0.3s ease;
 }
 
 .btn-secondary:hover .btn-icon {
-  background-color: var(--landing-accent);
+  background-color: var(--color-navy);
   color: white;
 }
 
@@ -434,7 +440,7 @@ nav.scrolled .nav-container {
   font-size: 11px;
   letter-spacing: 0.15em;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--color-navy);
 }
 
 .hero-visual {

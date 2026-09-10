@@ -4,9 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { googleAuth, loginUser } from '../api/auth';
 import { AuthContext } from '../context/AuthContext';
 import { useLoading } from '../context/LoadingContext';
-import heroImage from '../assets/hero.png';
 import { auth, googleProvider } from './firebase';
 import './css/Login.css';
+
+const heroImage = 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -215,20 +216,16 @@ export default function Login() {
         </footer>
       </section>
 
-      <section className="login-right">
-        <div
-          className="login-image"
-          style={{
-            backgroundImage: `url(${heroImage})`
-          }}
-        ></div>
-
+      <section className="login-right" style={{
+        backgroundImage: `linear-gradient(to top, rgba(11,20,38,0.85), rgba(11,20,38,0.1)), url(${heroImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
         <div className="login-overlay"></div>
 
         <div className="login-caption">
-          <div className="caption-divider"></div>
-          <p className="caption-label">PREMIUM ACCESS</p>
-          <p className="caption-quote">"Stewardship is the art of understanding spaces and their promise."</p>
+          <p className="caption-quote">Every request, tracked and resolved.</p>
+          <p className="caption-subtitle">Smart support for homes, offices, and everyday maintenance.</p>
         </div>
       </section>
     </main>

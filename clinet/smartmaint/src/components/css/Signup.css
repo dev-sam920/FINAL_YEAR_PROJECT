@@ -158,6 +158,9 @@ input:-webkit-autofill:focus {
     flex-direction: row;
     padding: 40px;
     align-items: stretch;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
   }
 }
 
@@ -179,11 +182,13 @@ input:-webkit-autofill:focus {
     width: 50%;
     max-width: 500px;
     min-height: 600px;
+    height: auto;
     padding: 64px;
     justify-content: flex-start;
     background-color: #faf9f8;
     border-radius: 8px;
     overflow-y: visible;
+    align-self: stretch;
   }
 }
 
@@ -785,14 +790,17 @@ input:-webkit-autofill:focus {
 @media (min-width: 768px) {
   .signup-right {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
+    width: 50%;
     max-width: 500px;
     min-height: 600px;
+    height: auto;
     border-radius: 8px;
     position: relative;
     overflow: hidden;
     align-self: stretch;
+    flex: 1;
   }
 }
 
@@ -825,36 +833,29 @@ input:-webkit-autofill:focus {
 /* Caption */
 .signup-caption {
   position: absolute;
-  bottom: var(--margin-desktop);
-  left: var(--margin-desktop);
-  max-width: 280px;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  max-width: 310px;
   z-index: 20;
   color: #ffffff;
 }
 
-.caption-divider {
-  height: 1px;
-  width: 48px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-container));
-  margin-bottom: 24px;
-}
-
-.caption-label {
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.15em;
-  font-weight: 600;
-  text-transform: uppercase;
-  opacity: 0.8;
-  margin-bottom: 8px;
-}
-
 .caption-quote {
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  line-height: 1.5;
-  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 600;
   letter-spacing: normal;
+  margin: 0;
+}
+
+.caption-subtitle {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 /* Grid Accent */

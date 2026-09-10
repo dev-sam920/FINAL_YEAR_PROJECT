@@ -146,7 +146,7 @@ const createApp = async () => {
 
     return app;
   } catch (error) {
-    console.error('Failed to start server:', error.message);
+    console.error('Failed to start server:', error.stack || error);
     process.exit(1);
   }
 };
