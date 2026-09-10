@@ -31,32 +31,31 @@ body {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  /* match the Acknowledge button sizing */
-  padding: 0.7rem 1rem !important;
+  padding: 8px 20px !important;
   border-radius: 9999px !important;
   width: fit-content !important;
   height: auto !important;
   white-space: nowrap !important;
   font-size: 14px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
   line-height: 1 !important;
   text-transform: none !important;
 }
 
-/* Strong global fallback: catch any element with a class containing "badge" and enforce flat, fitted pill styling */
+/* Strong global fallback: catch any element with a class containing "badge" and enforce a larger pill-style badge */
 [class*="badge"] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 4px 8px !important;
-  border-radius: 12px !important;
+  padding: 8px 20px !important;
+  border-radius: 9999px !important;
   width: fit-content !important;
   min-width: 0 !important;
   min-height: 0 !important;
   height: auto !important;
   white-space: nowrap !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
   line-height: 1 !important;
   vertical-align: middle !important;
   box-sizing: border-box !important;

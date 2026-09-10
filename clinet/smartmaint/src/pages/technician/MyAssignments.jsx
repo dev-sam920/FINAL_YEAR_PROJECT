@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Droplet, Hammer, Zap } from 'lucide-react';
 import { getMyAssignments, updateRequestStatus, acknowledgeRequest, setRequestPrice } from '../../api/technician';
 import TechnicianRequestDetailsModal from '../../components/TechnicianRequestDetailsModal';
 import { AuthContext } from '../../context/AuthContext';
@@ -28,6 +29,36 @@ const getStatusLabel = (status) => {
     case 'completed': return 'Completed';
     default: return status;
   }
+};
+
+const getPriorityBorderColor = (priority) => {
+  switch ((priority || 'Medium').toLowerCase()) {
+    case 'high': return '#EF4444';
+    case 'medium': return '#F59E0B';
+    case 'low':
+    default: return '#9CA3AF';
+  }
+};
+
+const getPriorityMetaColor = (priority) => {
+  switch ((priority || 'Medium').toLowerCase()) {
+    case 'high': return { background: '#FEE2E2', color: '#B91C1C' };
+    case 'medium': return { background: '#FEF3C7', color: '#B45309' };
+    case 'low':
+    default: return { background: '#E5E7EB', color: '#374151' };
+  }
+};
+
+const getCategoryIcon = (category) => {
+  const normalized = String(category || '').toLowerCase();
+
+  if (normalized.includes('plumb') || normalized.includes('pipe') || normalized.includes('sink')) {
+    return Droplet;
+  }
+  if (normalized.includes('elect') || normalized.includes('power') || normalized.includes('light') || normalized.includes('fan')) {
+    return Zap;
+  }
+  return Hammer;
 };
 
 export default function MyAssignments() {
@@ -83,6 +114,9 @@ export default function MyAssignments() {
     const tabKey = activeTab === 'In Progress' ? 'in-progress' : activeTab.toLowerCase();
     return apiStatus === tabKey;
   }), [requests, activeTab]);
+
+  const activeRequests = filtered.filter((request) => (request.status || 'submitted') !== 'completed');
+  const completedRequests = filtered.filter((request) => (request.status || 'submitted') === 'completed');
 
   const openDetails = (request) => { setSelectedRequest(request); setIsModalOpen(true); };
   const closeDetails = () => { setSelectedRequest(null); setIsModalOpen(false); };
@@ -182,35 +216,65 @@ export default function MyAssignments() {
         {successMessage && <div style={{ padding: '0.8rem 1rem', borderRadius: 12, background: '#E8F1FF', color: '#2563EB' }}>{successMessage}</div>}
 
         <section style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
-          {filtered.map((request) => {
+          {activeRequests.length > 0 && activeRequests.map((request) => {
             const status = request.status || 'submitted';
+            const priority = request.priority || 'Medium';
+            const CategoryIcon = getCategoryIcon(request.category);
+            const priorityMeta = getPriorityMetaColor(priority);
+            const priorityBorder = getPriorityBorderColor(priority);
+            const iconSize = 38;
+
             return (
-              <div key={request._id} onClick={() => openDetails(request)} style={{ borderRadius: 20, background: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 12px 28px rgba(17,17,17,0.08)', padding: '1.2rem', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 17 }}>{request.title || 'Maintenance Request'}</div>
-                    <div style={{ marginTop: 6, color: '#6B7280', fontSize: 13 }}>{request.client?.fullName || 'Client'} · {request.client?.email || 'No email'} · {request.client?.phone || 'No phone'}</div>
-                    <div style={{ marginTop: 6, color: '#6B7280', fontSize: 13 }}>{request.category || 'General'} · {request.location || 'Location not provided'}</div>
+              <div
+                key={request._id}
+                onClick={() => openDetails(request)}
+                style={{
+                  borderRadius: 18,
+                  background: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderLeft: `3px solid ${priorityBorder}`,
+                  boxShadow: '0 12px 28px rgba(17,17,17,0.08)',
+                  padding: '1.1rem 1rem 1.1rem 0.9rem',
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div
+                    style={{
+                      width: iconSize,
+                      height: iconSize,
+                      borderRadius: 12,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: priorityMeta.background,
+                      color: priorityMeta.color,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CategoryIcon size={18} />
                   </div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <span className={`request-badge priority-${(request.priority || 'Medium').toLowerCase()}`}>{request.priority || 'Medium'}</span>
-                    <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
+
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 17, color: '#111111' }}>{request.title || 'Maintenance Request'}</div>
+                      <div style={{ marginTop: 6, color: '#6B7280', fontSize: 13, lineHeight: 1.5 }}>
+                        {request.client?.fullName || 'Client'} · {request.category || 'General'} · {request.location || 'Location not provided'}
+                      </div>
+                      <div style={{ marginTop: 2, color: '#9CA3AF', fontSize: 12 }}>
+                        Assigned {request.createdAt ? new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Recently'}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <span className={`request-badge priority-${(priority || 'Medium').toLowerCase()}`}>{priority || 'Medium'}</span>
+                      <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ color: '#6B7280', fontSize: 13 }}>
-                    {status === 'completed'
-                      ? 'Work completed'
-                      : status === 'in-progress'
-                      ? 'Assigned for active work'
-                      : status === 'assigned'
-                      ? 'Please acknowledge this assignment'
-                      : status === 'acknowledged'
-                      ? 'Ready to begin work'
-                      : 'Awaiting technician action'}
-                  </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }} onClick={(event) => event.stopPropagation()}>
+                {status !== 'completed' && (
+                  <div style={{ marginTop: 14, display: 'flex', justifyContent: 'flex-end', gap: 10, alignItems: 'center', flexWrap: 'wrap' }} onClick={(event) => event.stopPropagation()}>
                     {status === 'assigned' && <button type="button" onClick={() => handleAcknowledge(request._id)} disabled={loading} style={{ border: 'none', background: '#10B981', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.8 : 1 }}>Acknowledge</button>}
                     {status === 'acknowledged' && !request.jobPrice && (
                       <button type="button" onClick={() => { setPriceRequestId(request._id); setPriceValue(''); }} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Set Price</button>
@@ -221,9 +285,8 @@ export default function MyAssignments() {
                       <button type="button" disabled style={{ border: 'none', background: '#E5E7EB', color: '#6B7280', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'not-allowed' }}>Awaiting payment</button>
                     ))}
                     {status === 'in-progress' && <button type="button" onClick={() => setPendingRequestId(request._id)} style={{ border: 'none', background: '#4285F4', color: '#FFFFFF', padding: '0.7rem 1rem', borderRadius: 9999, cursor: 'pointer' }}>Mark Complete</button>}
-                    {status === 'completed' && <span style={{ color: '#2563EB', fontWeight: 700 }}>Completed</span>}
                   </div>
-                </div>
+                )}
 
                 {pendingRequestId === request._id && (
                   <div style={{ marginTop: 12, padding: '0.9rem', borderRadius: 16, background: '#F9FAFB', border: '1px solid #E5E7EB' }} onClick={(event) => event.stopPropagation()}>
@@ -249,6 +312,67 @@ export default function MyAssignments() {
               </div>
             );
           })}
+
+          {completedRequests.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ paddingTop: 8, fontSize: 11, letterSpacing: '0.14em', fontWeight: 700, color: '#6B7280' }}>COMPLETED</div>
+              {completedRequests.map((request) => {
+                const status = request.status || 'completed';
+                const priority = request.priority || 'Medium';
+                const CategoryIcon = getCategoryIcon(request.category);
+                const priorityMeta = getPriorityMetaColor(priority);
+
+                return (
+                  <div
+                    key={`${request._id}-completed`}
+                    onClick={() => openDetails(request)}
+                    style={{
+                      borderRadius: 18,
+                      background: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderLeft: 'none',
+                      boxShadow: '0 10px 20px rgba(17,17,17,0.04)',
+                      padding: '0.9rem 0.9rem 0.9rem 0.8rem',
+                      cursor: 'pointer',
+                      opacity: 0.6,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: priorityMeta.background,
+                          color: priorityMeta.color,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <CategoryIcon size={16} />
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontWeight: 600, fontSize: 15, color: '#111111' }}>{request.title || 'Maintenance Request'}</div>
+                          <div style={{ marginTop: 4, color: '#6B7280', fontSize: 12, lineHeight: 1.4 }}>
+                            {request.client?.fullName || 'Client'} · {request.category || 'General'} · {request.location || 'Location not provided'}
+                          </div>
+                          <div style={{ marginTop: 2, color: '#9CA3AF', fontSize: 11 }}>
+                            Assigned {request.createdAt ? new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Recently'}
+                          </div>
+                        </div>
+
+                        <span className={`request-badge status-${status}`}>{getStatusLabel(status)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
       {isModalOpen && <TechnicianRequestDetailsModal request={selectedRequest} onClose={closeDetails} />}
